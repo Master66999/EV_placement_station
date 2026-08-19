@@ -301,8 +301,15 @@ class EVisionPlannerApp {
     const closeModalBtn = document.getElementById('btn-close-modal');
     const printReportBtn = document.getElementById('btn-print-report');
 
+    const sendReportBtn = document.getElementById('btn-send-dpr-report');
+
     if (openModalBtn && modalBackdrop) {
-      openModalBtn.addEventListener('click', () => modalBackdrop.classList.add('active'));
+      openModalBtn.addEventListener('click', () => {
+        if (window.EVisionMapManager) {
+          window.EVisionMapManager.prepareMapForExport();
+        }
+        modalBackdrop.classList.add('active');
+      });
     }
     if (closeModalBtn && modalBackdrop) {
       closeModalBtn.addEventListener('click', () => modalBackdrop.classList.remove('active'));
@@ -313,7 +320,29 @@ class EVisionPlannerApp {
       });
     }
     if (printReportBtn) {
-      printReportBtn.addEventListener('click', () => window.print());
+      printReportBtn.addEventListener('click', () => {
+        if (window.EVisionMapManager) {
+          window.EVisionMapManager.prepareMapForExport();
+        }
+        if (modalBackdrop) modalBackdrop.classList.remove('active');
+        setTimeout(() => {
+          window.print();
+        }, 180);
+      });
+    }
+    if (sendReportBtn) {
+      sendReportBtn.addEventListener('click', () => {
+        const emailInput = document.getElementById('export-recipient-email');
+        const recipient = emailInput ? emailInput.value : 'investor@evision.in';
+        if (window.EVisionMapManager) {
+          window.EVisionMapManager.prepareMapForExport();
+        }
+        if (modalBackdrop) modalBackdrop.classList.remove('active');
+        setTimeout(() => {
+          alert(`DPR Site Feasibility Dossier (with Geospatial Map & Financial Models) exported successfully! Sent to ${recipient}`);
+          window.print();
+        }, 200);
+      });
     }
   }
 
@@ -829,6 +858,29 @@ class EVisionPlannerApp {
       const el = document.getElementById(id);
       if (el) el.innerHTML = html;
     };
+
+    try {
+      // Export Modal Preview Binding
+      if (data.metadata) {
+        setElemText('export-site-name', data.metadata.siteName || 'Selected Site Location');
+        if (Array.isArray(data.metadata.coordinates)) {
+          setElemText('export-site-coords', `[${data.metadata.coordinates[0].toFixed(4)}, ${data.metadata.coordinates[1].toFixed(4)}] • ${data.metadata.analysisRadiusKm || 5} km Catchment Radius`);
+        }
+      }
+      if (data.feasibility) {
+        setElemText('export-site-score', `${data.feasibility.overallScore} / 100 SCORE (${data.feasibility.grade})`);
+      }
+      if (data.capex) {
+        setElemText('export-site-capex', `₹${data.capex.totalMinLakh} – ₹${data.capex.totalMaxLakh} Lakhs`);
+      }
+      if (data.financials && data.financials.baseline) {
+        const profitLakh = (data.financials.baseline.monthlyNetProfit / 100000).toFixed(2);
+        setElemText('export-site-profit', `₹${profitLakh} Lakhs/mo`);
+        setElemText('export-site-payback', `~${data.financials.baseline.paybackMonths} Months`);
+      }
+    } catch (err) {
+      console.error('Error rendering export summary preview:', err);
+    }
 
     // Ensure dashboard container is visible
     const dashView = document.getElementById('dashboard-view');

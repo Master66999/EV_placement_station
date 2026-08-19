@@ -378,6 +378,17 @@ class EVisionMapManager {
     }
   }
 
+  prepareMapForExport() {
+    if (!this.dashboardMap) return;
+    this.dashboardMap.invalidateSize();
+    if (this.layerGroups.radiusCircle) {
+      const layers = this.layerGroups.radiusCircle.getLayers();
+      if (layers && layers.length > 0 && layers[0].getBounds) {
+        this.dashboardMap.fitBounds(layers[0].getBounds(), { padding: [30, 30] });
+      }
+    }
+  }
+
   /**
    * Highlight / un-highlight an alternative site marker.
    * Called bidirectionally when user hovers an alt-site card.

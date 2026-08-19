@@ -21,6 +21,58 @@
 
   <!-- EVision Site Planner Stylesheet -->
   <link rel="stylesheet" href="css/styles.css">
+
+  <!-- Print & PDF Export Map Rendering Styles -->
+  <style>
+    @media print {
+      body {
+        background: #0d1017 !important;
+        color: #ffffff !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .top-nav, .modal-backdrop, .no-print, #questionnaire-view, #processing-view, .site-header {
+        display: none !important;
+      }
+      #dashboard-view {
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        width: 100% !important;
+        position: static !important;
+      }
+      #dashboard-interactive-map, .leaflet-container {
+        height: 480px !important;
+        width: 100% !important;
+        min-height: 450px !important;
+        position: relative !important;
+        display: block !important;
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .leaflet-tile-container, .leaflet-tile-container img, .leaflet-tile {
+        visibility: visible !important;
+        opacity: 1 !important;
+        max-width: none !important;
+        display: block !important;
+      }
+      .leaflet-control-container {
+        display: none !important;
+      }
+      .dash-card, .verdict-card, .subloc-recommendation-panel {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        background: #13151b !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        margin-bottom: 20px !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -1468,35 +1520,64 @@
   <!-- =================================================================
        REPORT & EXPORT MODAL DIALOG
        ================================================================= -->
+  <!-- =================================================================
+       REPORT & EXPORT MODAL DIALOG
+       ================================================================= -->
   <div class="modal-backdrop" id="modal-report-dialog">
-    <div class="modal-window">
+    <div class="modal-window" style="max-width: 680px; width: 92%;">
       <div class="modal-header">
-        <h3 style="font-size:1.125rem;">Detailed Project Report (DPR) Export</h3>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="mono-tag green">DPR EXPORT GENERATOR</span>
+          <h3 style="font-size:1.125rem; margin: 0;">Detailed Project Report (DPR) Dossier</h3>
+        </div>
         <button type="button" class="modal-close-btn" id="btn-close-modal">✕</button>
       </div>
-      <p style="font-size:0.875rem;color:var(--text-secondary);margin-bottom:20px;">
-        Generate an investor-ready site assessment dossier including single-line electrical SLDs, Discom sanction
-        application drafts, and equipment CapEx quotes.
+      <p style="font-size:0.875rem;color:var(--text-secondary);margin-bottom:16px;">
+        Generate an investor-ready site assessment dossier including single-line electrical SLDs, spatial map data, Discom sanction application drafts, and equipment CapEx quotes.
       </p>
+
+      <!-- Live Dashboard Data Preview Box -->
+      <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 14px; margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+          <div>
+            <div style="font-size: 0.75rem; color: var(--accent-orange); font-family: var(--font-mono); text-transform: uppercase;">ANALYZED LOCATION SUMMARY</div>
+            <h4 style="margin: 2px 0 4px 0; color: #FFFFFF; font-size: 1.05rem;" id="export-site-name">Mumbai-Pune Expressway (Khalapur)</h4>
+            <div style="font-size: 0.8125rem; color: var(--text-muted); font-family: var(--font-mono);" id="export-site-coords">[18.8242, 73.2845] • 5.0 km Catchment Radius</div>
+          </div>
+          <div style="text-align: right;">
+            <span class="mono-tag green" id="export-site-score" style="font-size: 0.85rem; padding: 4px 8px;">88 / 100 SCORE (A+)</span>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; font-size: 0.8125rem; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06);">
+          <div><span style="color: var(--text-muted);">Est. Project CapEx:</span> <strong style="color: #FFFFFF;" id="export-site-capex">₹28.5L – ₹36.2L</strong></div>
+          <div><span style="color: var(--text-muted);">Monthly Net Profit:</span> <strong style="color: var(--accent-green);" id="export-site-profit">₹1.82 Lakhs/mo</strong></div>
+          <div><span style="color: var(--text-muted);">Payback Horizon:</span> <strong style="color: var(--accent-orange);" id="export-site-payback">~28 Months</strong></div>
+        </div>
+      </div>
 
       <div class="form-group">
         <label class="form-label">Recipient Email Address</label>
-        <input type="email" class="input-text" value="investor@evision.in" placeholder="name@company.com">
+        <input type="email" class="input-text" id="export-recipient-email" value="investor@evision.in" placeholder="name@company.com">
       </div>
 
       <div class="form-group">
-        <label class="form-label">Report Format</label>
+        <label class="form-label">Select Report Export Modules</label>
         <div class="options-grid" style="grid-template-columns: 1fr 1fr;">
-          <div class="option-card selected"><span class="option-title">Comprehensive PDF Dossier (18 Pages)</span></div>
-          <div class="option-card"><span class="option-title">Financial Sensitivity Model (Excel)</span></div>
+          <div class="option-card selected"><span class="option-title">🗺️ Geospatial Catchment & Competitors Map</span></div>
+          <div class="option-card selected"><span class="option-title">⚡ 6-Pillar Feasibility & Grid Headroom</span></div>
+          <div class="option-card selected"><span class="option-title">💰 CapEx & Cost Reduction Blueprint</span></div>
+          <div class="option-card selected"><span class="option-title">📈 Live Financial Sensitivity Model</span></div>
         </div>
       </div>
 
       <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:24px;">
-        <button type="button" class="btn btn-secondary" id="btn-print-report">Print Assessment</button>
-        <button type="button" class="btn btn-primary"
-          onclick="alert('DPR dossier queued for export. Sent to recipient email.'); document.getElementById('modal-report-dialog').classList.remove('active');">Send
-          Report Dossier</button>
+        <button type="button" class="btn btn-secondary" id="btn-print-report">
+          🖨️ Print / Save as PDF
+        </button>
+        <button type="button" class="btn btn-primary" id="btn-send-dpr-report">
+          🚀 Export Full Site DPR Report
+        </button>
       </div>
     </div>
   </div>

@@ -21,6 +21,58 @@
 
   <!-- EVision Site Planner Stylesheet -->
   <link rel="stylesheet" href="css/styles.css">
+
+  <!-- Print & PDF Export Map Rendering Styles -->
+  <style>
+    @media print {
+      body {
+        background: #0d1017 !important;
+        color: #ffffff !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .top-nav, .modal-backdrop, .no-print, #questionnaire-view, #processing-view, .site-header {
+        display: none !important;
+      }
+      #dashboard-view {
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        width: 100% !important;
+        position: static !important;
+      }
+      #dashboard-interactive-map, .leaflet-container {
+        height: 480px !important;
+        width: 100% !important;
+        min-height: 450px !important;
+        position: relative !important;
+        display: block !important;
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .leaflet-tile-container, .leaflet-tile-container img, .leaflet-tile {
+        visibility: visible !important;
+        opacity: 1 !important;
+        max-width: none !important;
+        display: block !important;
+      }
+      .leaflet-control-container {
+        display: none !important;
+      }
+      .dash-card, .verdict-card, .subloc-recommendation-panel {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        background: #13151b !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        margin-bottom: 20px !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
+  </style>
 </head>
 
 <body>
