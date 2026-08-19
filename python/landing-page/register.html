@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EVISION — Unified Access Portal</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Unbounded:wght@700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              orange: '#EA650F',
+              container: '#ED7117',
+              orangeDark: '#C2410C',
+              orangeLight: '#FFF7ED',
+              surface: '#FFFFFF',
+              dark: '#0F172A',
+              muted: '#64748B',
+              border: '#E2E8F0',
+            }
+          },
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            glusp: ['Unbounded', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        }
+      }
+    }
+  </script>
+
+  <!-- Extracted Separate CSS -->
+  <link rel="stylesheet" href="css/register.css">
+</head>
+
+<body class="m-0 p-0 w-full min-h-screen">
+
+  <!-- EVision Global Loader with Flying Logo -->
+  <div id="evision-global-loader" class="evision-loader-container">
+    <div id="loader-content-box" class="evision-loader-content">
+      <h1 id="flying-evision-logo" class="evision-loader-logo">EVISION</h1>
+      <div id="loader-orange-line" class="evision-loader-line"></div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- FULL SCREEN EDGE-TO-EDGE CANVAS CONTAINER (0 Margin & 0 Padding)-->
+  <!-- ============================================================== -->
+  <div class="w-full min-h-screen m-0 p-6 md:p-10 relative overflow-hidden flex flex-col justify-between">
+
+    <!-- Background Image covering the entire 100% screen edge-to-edge -->
+    <img src="images/Gemini_Generated_Image_q0n49uq0n49uq0n4(1).png"
+      class="absolute inset-0 w-full h-full object-cover object-center z-0 pointer-events-none"
+      alt="EV Charging Infrastructure Background" />
+
+    <!-- Subtle gradient overlay for clean contrast -->
+    <div class="absolute inset-0 z-0 bg-gradient-to-r from-black/25 via-transparent to-black/15 pointer-events-none">
+    </div>
+
+    <!-- Top Navigation Header -->
+    <header class="w-full flex justify-between items-center z-20 mb-4">
+      <a href="landing.html" class="flex items-center gap-2.5 text-white no-underline group">
+        <div
+          class="w-9 h-9 rounded-lg bg-brand-container flex items-center justify-center text-white shadow-md transition-transform group-hover:scale-105 shrink-0">
+          <span class="material-symbols-outlined text-[20px] font-bold">electric_bolt</span>
+        </div>
+        <div class="flex flex-col justify-center">
+          <!-- Docking target for flying EVISION logo -->
+          <div id="brand-logo-target" class="h-6 flex items-center min-w-[85px]"></div>
+          <span class="font-mono text-[9px] uppercase text-brand-container tracking-wider font-semibold -mt-0.5">Command
+            Portal</span>
+        </div>
+      </a>
+
+      <a href="landing.html"
+        class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-white/15 hover:bg-white/25 border border-white/20 text-slate-100 hover:text-white text-xs font-medium backdrop-blur-md transition-colors">
+        <span class="material-symbols-outlined text-[15px]">arrow_back</span>
+        <span>Return to Command Center</span>
+      </a>
+    </header>
+
+    <!-- CONTENT WRAPPER -->
+    <div
+      class="relative z-10 w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-8 my-auto">
+
+      <!-- ========================================================== -->
+      <!-- LEFT PANE: ORANGE & WHITE ACCESS PORTAL CARD               -->
+      <!-- ========================================================== -->
+      <div class="glass-auth-card w-full md:w-[620px] p-7 md:py-8 md:pl-8 md:pr-12 shrink-0 relative overflow-hidden">
+
+        <!-- Subtle warm ambient glow inside card -->
+        <div
+          class="absolute -top-12 -left-12 w-36 h-36 bg-brand-container/15 rounded-full blur-[35px] pointer-events-none">
+        </div>
+
+        <!-- Geometric Icon Glyph in Brand Orange -->
+        <div class="flex justify-start mb-5 text-brand-container">
+          <svg width="36" height="36" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 24H36" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" />
+            <path d="M24 12V36" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" />
+            <circle cx="16" cy="16" r="3" fill="currentColor" />
+            <circle cx="32" cy="16" r="3" fill="currentColor" />
+            <circle cx="16" cy="32" r="3" fill="currentColor" />
+            <circle cx="32" cy="32" r="3" fill="currentColor" />
+          </svg>
+        </div>
+
+        <!-- ================= SIGN IN VIEW ================= -->
+        <div id="view-signin">
+
+          <div class="text-left mb-6">
+            <h1 class="text-2xl font-bold text-slate-900 mb-1.5 tracking-tight">Access Portal</h1>
+            <p class="text-xs text-slate-500">Enter your credentials to connect to the EV grid.</p>
+          </div>
+
+          <!-- Form Inputs -->
+          <form onsubmit="handleLoginSubmit(event)" class="space-y-4 relative z-10">
+
+            <div>
+              <label for="signin-email"
+                class="block text-xs font-semibold text-slate-600 mb-1.5 ml-1 tracking-wide uppercase">OPERATOR
+                EMAIL</label>
+              <input type="email" id="signin-email" value="admin@evision.in" required placeholder="admin@evision.in"
+                class="input-field w-full rounded-xl py-3 px-4 text-sm font-medium" />
+            </div>
+
+            <div>
+              <label for="signin-password"
+                class="block text-xs font-semibold text-slate-600 mb-1.5 ml-1 tracking-wide uppercase">SECURITY
+                KEY</label>
+              <input type="password" id="signin-password" value="••••••••••••" required placeholder="••••••••••••"
+                class="input-field w-full rounded-xl py-3 px-4 text-sm tracking-[0.3em] font-mono" />
+            </div>
+
+            <!-- Remember & Recover Link -->
+            <div class="flex items-center justify-between pt-1 mb-2">
+              <label class="flex items-center gap-2.5 cursor-pointer group">
+                <input type="checkbox" id="signin-remember" checked>
+                <span class="text-xs text-slate-600 font-medium group-hover:text-slate-900 transition-colors">Keep
+                  Session Active</span>
+              </label>
+
+              <a href="#"
+                onclick="alert('Security key recovery link dispatched to verified operator email.'); return false;"
+                class="text-xs text-brand-container font-semibold hover:text-brand-orangeDark transition-colors">Recover
+                Key</a>
+            </div>
+
+            <!-- Authenticate Button in Brand Orange -->
+            <button type="submit"
+              class="w-full bg-gradient-to-r from-brand-orange to-brand-container hover:from-orange-600 hover:to-orange-500 text-white text-sm font-bold py-3.5 rounded-xl transition-all duration-200 shadow-[0_8px_20px_rgba(237,113,23,0.35)] hover:shadow-[0_10px_25px_rgba(237,113,23,0.5)] hover:-translate-y-0.5 mt-2 uppercase tracking-wider">
+              AUTHENTICATE
+            </button>
+          </form>
+
+        </div>
+
+        <!-- ================= REGISTER VIEW ================= -->
+        <div id="view-register" class="hidden">
+
+          <div class="text-left mb-5">
+            <h2 class="text-2xl font-bold text-slate-900 mb-1 tracking-tight">Register Station</h2>
+            <p class="text-xs text-slate-500">Connect your station project to the national grid.</p>
+          </div>
+
+          <form onsubmit="handleRegisterSubmit(event)" class="space-y-3.5 relative z-10">
+
+            <div>
+              <label for="reg-name" class="block text-xs font-semibold text-slate-600 mb-1 ml-1 uppercase">CONTACT
+                NAME</label>
+              <input type="text" id="reg-name" required placeholder="Rajesh Sharma"
+                class="input-field w-full rounded-xl py-2.5 px-3.5 text-sm" />
+            </div>
+
+            <div>
+              <label for="reg-email" class="block text-xs font-semibold text-slate-600 mb-1 ml-1 uppercase">WORK
+                EMAIL</label>
+              <input type="email" id="reg-email" required placeholder="rajesh@cleaninfra.in"
+                class="input-field w-full rounded-xl py-2.5 px-3.5 text-sm font-mono" />
+            </div>
+
+            <button type="submit"
+              class="w-full bg-gradient-to-r from-brand-orange to-brand-container hover:from-orange-600 hover:to-orange-500 text-white text-sm font-bold py-3.5 rounded-xl transition-all duration-200 shadow-[0_8px_20px_rgba(237,113,23,0.35)] hover:shadow-[0_10px_25px_rgba(237,113,23,0.5)] hover:-translate-y-0.5 mt-2 uppercase tracking-wider">
+              REGISTER &amp; LAUNCH
+            </button>
+          </form>
+
+        </div>
+
+        <!-- Bottom Switcher -->
+        <div class="mt-5 pt-3 border-t border-slate-200/80 text-center">
+          <p id="bottom-switch-prompt" class="text-xs text-slate-500 font-medium">
+            New Operator?
+            <button type="button" onclick="switchAuthTab('register')"
+              class="text-brand-container font-semibold hover:text-brand-orangeDark transition-colors ml-1 underline underline-offset-2">
+              Register Station
+            </button>
+          </p>
+        </div>
+
+      </div>
+
+      <!-- ========================================================== -->
+      <!-- RIGHT PANE: EVISION BRANDING OVER THE CHARGING PEDESTAL    -->
+      <!-- ========================================================== -->
+      <div
+        class="max-w-md self-end md:self-end mt-auto p-5 rounded-2xl bg-black/40 backdrop-blur-sm border border-white/10 shadow-lg">
+        <h2 class="text-5xl md:text-7xl font-extrabold text-white mb-2 tracking-tight font-glusp">
+          EVISION
+        </h2>
+        <p class="text-white/90 text-sm md:text-base font-normal max-w-sm leading-relaxed">
+          Connect your charging station project to the unified grid telemetry and live power allocation network.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Minimal Bottom Footer -->
+    <footer class="w-full text-center text-xs text-white/60 font-mono z-20 mt-4">
+      &copy; 2026 EVISION India. All rights reserved.
+    </footer>
+
+  </div>
+
+  <!-- Extracted Separate JS -->
+  <script src="js/register.js"></script>
+
+</body>
+
+</html>

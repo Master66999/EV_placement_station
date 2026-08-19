@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EVision — EV Charging Site Planner & Infrastructure Feasibility</title>
+  <meta name="description"
+    content="Awwwards-grade EV charging station site assessment, grid feasibility analyzer, and investment ROI modeling tool.">
+
+  <!-- Google Fonts: Plus Jakarta Sans (Body/Headings) & Space Mono (Technical Data Tags) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
+    rel="stylesheet">
+
+  <!-- Leaflet Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+  <!-- EVision Site Planner Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+  <div class="planner-wrapper">
+    <!-- =================================================================
+         SITE HEADER (Persistent across steps)
+         ================================================================= -->
+    <header class="site-header">
+      <div class="brand-section">
+        <div class="brand-badge-row">
+          <div class="brand-logo-text">EVISION<span>.</span></div>
+          <span class="mono-tag orange">INFRASTRUCTURE INTELLIGENCE</span>
+        </div>
+        <div class="brand-subtext">EV CHARGING SITE PLANNER</div>
+        <p class="header-tagline">Find the right location, infrastructure and investment strategy for your next charging
+          station.</p>
+      </div>
+
+      <div class="header-actions">
+        <a href="3dvision.html" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm"
+          id="btn-nav-vision3d"
+          style="display:inline-flex;text-decoration:none;align-items:center;gap:6px;cursor:pointer;border-color:var(--accent-orange);color:var(--accent-orange);font-weight:700;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-orange)" stroke-width="2.2">
+            <path
+              d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+            <line x1="12" y1="22.08" x2="12" y2="12" />
+          </svg>
+          3D Vision Studio ↗
+        </a>
+        <a href="../landing.html" class="btn btn-secondary btn-sm" id="btn-nav-home"
+          style="display:inline-flex;text-decoration:none;align-items:center;gap:6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+          </svg>
+          Landing Page
+        </a>
+        <span class="mono-tag green">v2.4 INDIAN MOBILITY ENGINE</span>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-replan-site" style="display:inline-flex;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+            <path d="M3 3v5h5" />
+          </svg>
+          Reset Planner
+        </button>
+      </div>
+    </header>
+
+    <!-- =================================================================
+         STEPPER PROGRESS BAR (01 to 08)
+         ================================================================= -->
+    <nav class="stepper-nav-container" aria-label="Questionnaire Progress">
+      <ol class="stepper-list">
+        <li class="step-item active" data-step="0">
+          <span class="step-number">01</span>
+          <span class="step-label">PROJECT</span>
+        </li>
+        <span class="step-divider">·</span>
+        <li class="step-item" data-step="1">
+          <span class="step-number">02</span>
+          <span class="step-label">LOCATION</span>
+        </li>
+        <span class="step-divider">·</span>
+        <li class="step-item" data-step="2">
+          <span class="step-number">03</span>
+          <span class="step-label">PROPERTY</span>
+        </li>
+        <span class="step-divider">·</span>
+        <li class="step-item" data-step="3">
+          <span class="step-number">04</span>
+          <span class="step-label">TARGET USERS</span>
+        </li>
+        <span class="step-divider">·</span>
+        <li class="step-item" data-step="4">
+          <span class="step-number">05</span>
+          <span class="step-label">CHARGING</span>
+        </li>
+        <span class="step-divider">·</span>
+        <li class="step-item" data-step="5">
+          <span class="step-number">06</span>
+          <span class="step-label">INVESTMENT</span>
+        </li>
+        <span class="step-divider">·</span>
+        <li class="step-item" data-step="6">
+          <span class="step-number">07</span>
+          <span class="step-label">GRID</span>
+        </li>
+        <span class="step-divider">·</span>
+        <li class="step-item" data-step="7">
+          <span class="step-number">08</span>
+          <span class="step-label">REVIEW</span>
+        </li>
+        <span class="step-divider">·</span>
+        <li class="step-item vision-quick-step">
+          <a href="3dvision.html" target="_blank" rel="noopener noreferrer"
+            style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;"
+            title="Open 3D Vision Studio in New Tab">
+            <span class="step-number" style="background:var(--accent-orange);color:#fff;font-weight:800;">3D</span>
+            <span class="step-label" style="color:var(--accent-orange);font-weight:700;">3D VISION ↗</span>
+          </a>
+        </li>
+      </ol>
+    </nav>
+
+    <!-- =================================================================
+         QUESTIONNAIRE VIEW (Steps 01 - 08)
+         ================================================================= -->
+    <main id="questionnaire-view" class="questionnaire-section">
+
+      <!-- STEP 01 — PROJECT -->
+      <section class="step-card active" id="step-card-1">
+        <div class="step-card-header">
+          <div class="step-badge-row">
+            <span class="mono-tag">STEP 01 OF 08</span>
+            <span class="mono-tag orange">PROJECT DEFINITION</span>
+          </div>
+          <h2 class="step-main-title">What are you planning to build?</h2>
+          <p class="step-lead-desc">Select the primary use-case and vehicle archetype for your charging asset. This
+            configures the demand models, electrical load profiles, and traffic dwell time calculations.</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Project Type (Single Select)</label>
+          <div class="options-grid">
+            <div class="option-card selected" data-field="projectType" data-value="public_station">
+              <span class="option-title">Public EV Charging Station</span>
+              <span class="option-desc">Standalone urban multi-gun charging station catering to daily commuters and
+                cabs.</span>
+            </div>
+            <div class="option-card" data-field="projectType" data-value="highway_hub">
+              <span class="option-title">Highway Charging Hub</span>
+              <span class="option-desc">High-power transit hub on national expressways with passenger amenities.</span>
+            </div>
+            <div class="option-card" data-field="projectType" data-value="fleet_charging">
+              <span class="option-title">Fleet Charging Station</span>
+              <span class="option-desc">Dedicated depot for commercial delivery fleets, e-rickshaws, and logistics
+                vans.</span>
+            </div>
+            <div class="option-card" data-field="projectType" data-value="commercial_park">
+              <span class="option-title">Commercial / Mall Hub</span>
+              <span class="option-desc">Co-located at shopping centers, dining precincts, and entertainment hubs.</span>
+            </div>
+            <div class="option-card" data-field="projectType" data-value="petrol_pump">
+              <span class="option-title">Petrol Pump + EV Charging</span>
+              <span class="option-desc">Retrofitting high-speed DC chargers onto an existing retail fuel station
+                forecourt.</span>
+            </div>
+            <div class="option-card" data-field="projectType" data-value="workplace">
+              <span class="option-title">Workplace / Tech Park</span>
+              <span class="option-desc">Long dwell-time smart AC and fast DC charging for corporate campus
+                employees.</span>
+            </div>
+            <div class="option-card" data-field="projectType" data-value="residential">
+              <span class="option-title">Residential Complex</span>
+              <span class="option-desc">Gated community and high-rise apartment charging with shared metering.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Primary Target Vehicles (Multi-Select)</label>
+          <div class="options-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+            <div class="checkbox-card selected" data-vehicle="2w">
+              <div class="custom-checkbox">✓</div>
+              <div>
+                <strong style="font-size:0.875rem;">2-Wheelers</strong>
+                <div style="font-size:0.75rem;color:var(--text-secondary);">e-Bikes & Scooters</div>
+              </div>
+            </div>
+            <div class="checkbox-card" data-vehicle="3w">
+              <div class="custom-checkbox">✓</div>
+              <div>
+                <strong style="font-size:0.875rem;">3-Wheelers</strong>
+                <div style="font-size:0.75rem;color:var(--text-secondary);">e-Rickshaw / e-Autos</div>
+              </div>
+            </div>
+            <div class="checkbox-card selected" data-vehicle="4w">
+              <div class="custom-checkbox">✓</div>
+              <div>
+                <strong style="font-size:0.875rem;">4-Wheelers</strong>
+                <div style="font-size:0.75rem;color:var(--text-secondary);">Cars & Electric SUVs</div>
+              </div>
+            </div>
+            <div class="checkbox-card" data-vehicle="commercial">
+              <div class="custom-checkbox">✓</div>
+              <div>
+                <strong style="font-size:0.875rem;">Commercial / Fleet</strong>
+                <div style="font-size:0.75rem;color:var(--text-secondary);">Delivery Vans & Buses</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Expected Project Scale</label>
+          <div class="options-grid options-grid-3">
+            <div class="option-card" data-field="scale" data-value="small">
+              <span class="option-title">Small Scale</span>
+              <span class="option-desc">2 to 4 charging guns (30 kW – 60 kW total load)</span>
+            </div>
+            <div class="option-card selected" data-field="scale" data-value="medium">
+              <span class="option-title">Medium Scale</span>
+              <span class="option-desc">4 to 8 charging guns (120 kW – 240 kW total load)</span>
+            </div>
+            <div class="option-card" data-field="scale" data-value="large">
+              <span class="option-title">Large Flagship Hub</span>
+              <span class="option-desc">8+ fast DC dispensers (360 kW – 500+ kW capacity)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card-footer">
+          <a href="../landing.html" class="btn btn-secondary" id="btn-step1-back-landing" style="display:inline-flex;text-decoration:none;align-items:center;gap:6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Back to Landing Page
+          </a>
+          <button type="button" class="btn btn-primary" data-action="next-step">
+            Proceed to Location
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 02 — LOCATION -->
+      <section class="step-card" id="step-card-2">
+        <div class="step-card-header">
+          <div class="step-badge-row">
+            <span class="mono-tag">STEP 02 OF 08</span>
+            <span class="mono-tag orange">GEOSPATIAL ANCHOR</span>
+          </div>
+          <h2 class="step-main-title">Where is the proposed location?</h2>
+          <p class="step-lead-desc">Search for an address, click/drag anywhere on the live map preview, or pick from
+            popular benchmark corridors.</p>
+        </div>
+
+        <div class="location-step-grid">
+          <div>
+            <div class="form-group">
+              <label class="form-label" for="input-location-search">Search Location / Address</label>
+              <div class="input-with-icon-wrapper">
+                <span class="input-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                </span>
+                <input type="text" class="input-text" id="input-location-search"
+                  value="Mumbai-Pune Expressway (Khalapur Toll Plaza)"
+                  placeholder="Search city, highway, landmark or PIN code">
+              </div>
+
+              <!-- Current Geolocation Trigger -->
+              <div class="current-location-btn-wrapper" style="margin-top: 8px; margin-bottom: 12px;">
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-use-current-location"
+                  onclick="window.EVisionPlannerApp && window.EVisionPlannerApp._handleCurrentLocation()"
+                  style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.8125rem; padding: 6px 14px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">
+                  <span class="loc-icon" style="font-size: 0.95rem; line-height: 1;">◎</span>
+                  <span class="loc-text">Use My Current Location</span>
+                </button>
+                <div id="location-status-msg"
+                  style="display: none; font-size: 0.75rem; margin-top: 6px; font-weight: 500;"></div>
+              </div>
+
+              <div class="preset-sites-row">
+                <span style="font-size:0.75rem;color:var(--text-muted);display:flex;align-items:center;">Quick
+                  Presets:</span>
+                <button type="button" class="preset-chip" data-preset="mumbai_highway">Mumbai-Pune Exp
+                  (Khalapur)</button>
+                <button type="button" class="preset-chip" data-preset="bengaluru_tech">Bengaluru (Bellandur
+                  ORR)</button>
+                <button type="button" class="preset-chip" data-preset="delhi_nh48">Gurugram (NH-48 Rajiv Chowk)</button>
+              </div>
+            </div>
+
+            <div class="options-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 20px;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" for="input-pincode">Postal PIN Code</label>
+                <input type="text" class="input-text" id="input-pincode" value="410203" placeholder="e.g. 410203">
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" for="input-lat-long">Latitude, Longitude</label>
+                <input type="text" class="input-text" id="input-lat-long" value="18.8242, 73.2845"
+                  placeholder="e.g. 18.8242, 73.2845">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Analysis Catchment Radius</label>
+              <div class="radius-pill-group">
+                <button type="button" class="radius-pill" data-radius="1">1 km</button>
+                <button type="button" class="radius-pill" data-radius="3">3 km</button>
+                <button type="button" class="radius-pill active" data-radius="5">5 km (Standard)</button>
+                <button type="button" class="radius-pill" data-radius="10">10 km</button>
+              </div>
+              <p class="data-source-note" style="margin-top:8px;">Defines the demographic catchment, VAHAN vehicle
+                population, and competitor audit boundary.</p>
+            </div>
+          </div>
+
+          <!-- Leaflet Live Mini-Map Preview -->
+          <div>
+            <label class="form-label">Live Geospatial Coordinate Preview</label>
+            <div id="location-picker-map" class="location-map-container"></div>
+            <div
+              style="font-size:0.75rem;color:var(--text-secondary);margin-top:6px;display:flex;justify-content:space-between;">
+              <span>• Click map or drag orange pin to re-center</span>
+              <span class="mono-tag">LIVE OSM / CARTO TILES</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card-footer">
+          <button type="button" class="btn btn-secondary" data-action="prev-step">Back</button>
+          <button type="button" class="btn btn-primary" data-action="next-step">
+            Proceed to Property
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 03 — PROPERTY -->
+      <section class="step-card" id="step-card-3">
+        <div class="step-card-header">
+          <div class="step-badge-row">
+            <span class="mono-tag">STEP 03 OF 08</span>
+            <span class="mono-tag orange">SITE CHARACTERISTICS</span>
+          </div>
+          <h2 class="step-main-title">Where are you installing the station?</h2>
+          <p class="step-lead-desc">Property classification determines civil engineering costs, transformer setback
+            requirements, right-of-way permissions, and operational dwell time.</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Property Type (Single Select)</label>
+          <div class="options-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+            <div class="option-card selected" data-field="propertyType" data-value="petrol_pump">
+              <span class="option-title">Petrol Pump Forecourt</span>
+              <span class="option-desc">Co-located at an active fuel station.</span>
+            </div>
+            <div class="option-card" data-field="propertyType" data-value="highway_hub">
+              <span class="option-title">Highway Roadside Site</span>
+              <span class="option-desc">Adjoining national / state highway corridor.</span>
+            </div>
+            <div class="option-card" data-field="propertyType" data-value="commercial_park">
+              <span class="option-title">Commercial IT / Office Park</span>
+              <span class="option-desc">Corporate campus with regular office dwell.</span>
+            </div>
+            <div class="option-card" data-field="propertyType" data-value="shopping_mall">
+              <span class="option-title">Shopping Mall / Retail</span>
+              <span class="option-desc">High footfall mall parking lot.</span>
+            </div>
+            <div class="option-card" data-field="propertyType" data-value="standalone_land">
+              <span class="option-title">Standalone Private Land</span>
+              <span class="option-desc">Undeveloped open commercial plot.</span>
+            </div>
+            <div class="option-card" data-field="propertyType" data-value="residential">
+              <span class="option-title">Residential Society</span>
+              <span class="option-desc">Apartment complex parking bay.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="options-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+          <div class="form-group">
+            <label class="form-label">Property Ownership</label>
+            <select class="select-custom" id="sel-ownership">
+              <option value="own" selected>Already Owned</option>
+              <option value="lease">Long-term Leased (>10 Years)</option>
+              <option value="negotiating">Negotiating Lease Agreement</option>
+              <option value="considering">Considering Property Options</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Available Footprint (Sq. Ft.)</label>
+            <input type="number" class="input-text" id="input-sqft" value="3500" placeholder="e.g. 3500">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Direct Arterial Road Access?</label>
+            <select class="select-custom" id="sel-road-access">
+              <option value="yes" selected>Yes — Direct Deceleration Lane</option>
+              <option value="service_road">Via Service Road / Side Street</option>
+              <option value="no">No — Inside Internal Campus</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Dedicated Parking Spaces</label>
+            <input type="number" class="input-text" id="input-bays" value="8" placeholder="e.g. 8">
+          </div>
+        </div>
+
+        <!-- Adaptive Container for Property-Specific Questions -->
+        <div id="adaptive-property-fields"></div>
+
+        <div class="step-card-footer">
+          <button type="button" class="btn btn-secondary" data-action="prev-step">Back</button>
+          <button type="button" class="btn btn-primary" data-action="next-step">
+            Proceed to Target Users
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 04 — TARGET USERS -->
+      <section class="step-card" id="step-card-4">
+        <div class="step-card-header">
+          <div class="step-badge-row">
+            <span class="mono-tag">STEP 04 OF 08</span>
+            <span class="mono-tag orange">USER DEMAND WEIGHTING</span>
+          </div>
+          <h2 class="step-main-title">Who are the primary EV drivers at this location?</h2>
+          <p class="step-lead-desc">Refine the user demographic mix to calibrate connector speeds, billing software
+            workflows, and peak utilization cycles.</p>
+        </div>
+
+        <div class="options-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));">
+          <div class="dash-card" style="padding:20px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <span class="option-title">Passenger 4-Wheelers</span>
+              <span class="mono-tag orange">45% Weight</span>
+            </div>
+            <p style="font-size:0.8125rem;color:var(--text-secondary);margin-bottom:12px;">Personal electric cars (Tata
+              Nexon, Mahindra XUV400, MG ZS EV, Hyundai Ioniq). Expect 30–60kW DC CCS2 charging with average dwell of
+              35–50 minutes.</p>
+            <span class="mono-tag green">HIGH REVENUE / kWh</span>
+          </div>
+
+          <div class="dash-card" style="padding:20px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <span class="option-title">2-Wheelers & LEVs</span>
+              <span class="mono-tag">35% Weight</span>
+            </div>
+            <p style="font-size:0.8125rem;color:var(--text-secondary);margin-bottom:12px;">e-Scooters (Ola, Ather, TVS
+              iQube, Bajaj Chetak). Requires high-density multi-port 3.3kW AC or fast DC Type-6 LEV plugs.</p>
+            <span class="mono-tag">HIGH TRANSACTION VOLUME</span>
+          </div>
+
+          <div class="dash-card" style="padding:20px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <span class="option-title">Commercial & Fleets</span>
+              <span class="mono-tag">20% Weight</span>
+            </div>
+            <p style="font-size:0.8125rem;color:var(--text-secondary);margin-bottom:12px;">Ride-hail cabs (BluSmart,
+              Uber Green) and last-mile logistics (Tata Ace EV). Demands rapid turnaround and bulk corporate billing.
+            </p>
+            <span class="mono-tag amber">HIGH UTILIZATION</span>
+          </div>
+        </div>
+
+        <div class="step-card-footer">
+          <button type="button" class="btn btn-secondary" data-action="prev-step">Back</button>
+          <button type="button" class="btn btn-primary" data-action="next-step">
+            Proceed to Charging Config
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 05 — CHARGING CONFIGURATION -->
+      <section class="step-card" id="step-card-5">
+        <div class="step-card-header">
+          <div class="step-badge-row">
+            <span class="mono-tag">STEP 05 OF 08</span>
+            <span class="mono-tag orange">EVSE HARDWARE MIX</span>
+          </div>
+          <h2 class="step-main-title">Select your charging equipment configuration</h2>
+          <p class="step-lead-desc">You can either let EVision compute the optimal charger mix based on demand and grid
+            headroom, or manually customize specific dispenser counts.</p>
+        </div>
+
+        <!-- Auto Recommend Toggle Box -->
+        <label class="toggle-recommend-box" for="chk-auto-recommend">
+          <input type="checkbox" id="chk-auto-recommend" checked>
+          <div>
+            <div
+              style="font-weight:700;font-size:0.9375rem;color:var(--color-green);display:flex;align-items:center;gap:8px;">
+              ✓ Let EVision recommend the optimal charger mix (Recommended)
+            </div>
+            <p style="font-size:0.8125rem;color:var(--text-secondary);margin-top:4px;">
+              Our algorithms analyze local EV registrations, peak traffic velocity, competitor deficits, and substation
+              limits to determine the ideal blend of AC destination and DC fast chargers.
+            </p>
+          </div>
+        </label>
+
+        <!-- Manual Counters Grid (Disabled when toggle is checked) -->
+        <div class="charger-counts-grid disabled" id="charger-counters-grid">
+          <div class="counter-card">
+            <div class="option-title">2-Wheeler LEV Chargers</div>
+            <div class="option-desc">3.3kW AC Multi-socket point</div>
+            <div class="counter-input-row">
+              <button type="button" class="counter-btn" data-action="minus" data-target="val-c2w">-</button>
+              <span class="counter-value" id="val-c2w">2</span>
+              <button type="button" class="counter-btn" data-action="plus" data-target="val-c2w">+</button>
+            </div>
+          </div>
+
+          <div class="counter-card">
+            <div class="option-title">4-Wheeler AC Type-2</div>
+            <div class="option-desc">7.4kW / 11kW / 22kW Smart AC</div>
+            <div class="counter-input-row">
+              <button type="button" class="counter-btn" data-action="minus" data-target="val-c4w-ac">-</button>
+              <span class="counter-value" id="val-c4w-ac">2</span>
+              <button type="button" class="counter-btn" data-action="plus" data-target="val-c4w-ac">+</button>
+            </div>
+          </div>
+
+          <div class="counter-card">
+            <div class="option-title">4W DC Fast (Dual Gun)</div>
+            <div class="option-desc">30kW – 60kW CCS2 Fast DC</div>
+            <div class="counter-input-row">
+              <button type="button" class="counter-btn" data-action="minus" data-target="val-c4w-dc">-</button>
+              <span class="counter-value" id="val-c4w-dc">2</span>
+              <button type="button" class="counter-btn" data-action="plus" data-target="val-c4w-dc">+</button>
+            </div>
+          </div>
+
+          <div class="counter-card">
+            <div class="option-title">High-Power DC Dispenser</div>
+            <div class="option-desc">120kW – 240kW Ultra-Fast CCS2</div>
+            <div class="counter-input-row">
+              <button type="button" class="counter-btn" data-action="minus" data-target="val-c-hpdc">-</button>
+              <span class="counter-value" id="val-c-hpdc">1</span>
+              <button type="button" class="counter-btn" data-action="plus" data-target="val-c-hpdc">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card-footer">
+          <button type="button" class="btn btn-secondary" data-action="prev-step">Back</button>
+          <button type="button" class="btn btn-primary" data-action="next-step">
+            Proceed to Investment
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 06 — INVESTMENT -->
+      <section class="step-card" id="step-card-6">
+        <div class="step-card-header">
+          <div class="step-badge-row">
+            <span class="mono-tag">STEP 06 OF 08</span>
+            <span class="mono-tag orange">CAPITAL BUDGET</span>
+          </div>
+          <h2 class="step-main-title">What is your planned investment budget?</h2>
+          <p class="step-lead-desc">CapEx spans EVSE hardware, dedicated transformer installation, civil canopies,
+            Discom sanction deposits, and cloud management software.</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Estimated Budget Bracket (Single Select)</label>
+          <div class="options-grid options-grid-3">
+            <div class="option-card" data-field="budget" data-value="under_10">
+              <span class="option-title">Under ₹10 Lakhs</span>
+              <span class="option-desc">Ideal for small AC hubs or single 30kW DC fast charger setup.</span>
+            </div>
+            <div class="option-card" data-field="budget" data-value="10_25">
+              <span class="option-title">₹10 – ₹25 Lakhs</span>
+              <span class="option-desc">Standard single 60kW DC dual-gun dispenser with LT connection.</span>
+            </div>
+            <div class="option-card selected" data-field="budget" data-value="25_50">
+              <span class="option-title">₹25 – ₹50 Lakhs</span>
+              <span class="option-desc">Multi-gun fast DC setup (60kW + 30kW) with dedicated transformer.</span>
+            </div>
+            <div class="option-card" data-field="budget" data-value="50_1cr">
+              <span class="option-title">₹50 Lakhs – ₹1 Crore</span>
+              <span class="option-desc">High-power highway hub (120kW+ DC) with customer canopy.</span>
+            </div>
+            <div class="option-card" data-field="budget" data-value="1cr_plus">
+              <span class="option-title">₹1 Crore +</span>
+              <span class="option-desc">Flagship mega-hub with solar canopy, BESS storage, and 8+ guns.</span>
+            </div>
+            <div class="option-card" data-field="budget" data-value="not_decided">
+              <span class="option-title">Not Decided</span>
+              <span class="option-desc">Let EVision estimate the minimum viable CapEx for this site.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card-footer">
+          <button type="button" class="btn btn-secondary" data-action="prev-step">Back</button>
+          <button type="button" class="btn btn-primary" data-action="next-step">
+            Proceed to Grid Feasibility
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 07 — GRID -->
+      <section class="step-card" id="step-card-7">
+        <div class="step-card-header">
+          <div class="step-badge-row">
+            <span class="mono-tag">STEP 07 OF 08</span>
+            <span class="mono-tag orange">ELECTRICAL INFRASTRUCTURE</span>
+          </div>
+          <h2 class="step-main-title">What electrical charging capacity do you require?</h2>
+          <p class="step-lead-desc">This checks if the local 11kV/33kV power grid substation has sufficient headroom to
+            sanction your commercial EV power load without delay.</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Desired Connected Electrical Load (Single Select)</label>
+          <div class="options-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+            <div class="option-card" data-field="desiredGridCapacity" data-value="30_60">
+              <span class="option-title">30 – 60 kW Load</span>
+              <span class="option-desc">LT Connection • No new transformer typically required.</span>
+            </div>
+            <div class="option-card selected" data-field="desiredGridCapacity" data-value="120_240">
+              <span class="option-title">120 – 240 kW Load</span>
+              <span class="option-desc">11kV HT Connection • Requires dedicated 250 kVA transformer.</span>
+            </div>
+            <div class="option-card" data-field="desiredGridCapacity" data-value="360_500">
+              <span class="option-title">360 – 500+ kW Load</span>
+              <span class="option-desc">11kV/33kV Express Feeder • 500 kVA+ dedicated transformer.</span>
+            </div>
+            <div class="option-card" data-field="desiredGridCapacity" data-value="custom">
+              <span class="option-title">Auto / Custom</span>
+              <span class="option-desc">Match automatically to recommended charger configuration.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="dash-card" style="background:var(--bg-cream);border-color:var(--border-main);margin-top:24px;">
+          <div style="font-weight:700;font-size:0.875rem;margin-bottom:6px;display:flex;align-items:center;gap:6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="16" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+            Why this matters for your site
+          </div>
+          <p style="font-size:0.8125rem;color:var(--text-secondary);line-height:1.45;">
+            State DISCOMs require high-speed DC stations (>100 kW) to connect via 11 kV HT lines. EVision queries the
+            nearest substation to ensure spare capacity exists, preventing unexpected ₹15L+ line extension costs.
+          </p>
+        </div>
+
+        <div class="step-card-footer">
+          <button type="button" class="btn btn-secondary" data-action="prev-step">Back</button>
+          <button type="button" class="btn btn-primary" data-action="next-step">
+            Review & Finalize
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 08 — REVIEW -->
+      <section class="step-card" id="step-card-8">
+        <div class="step-card-header">
+          <div class="step-badge-row">
+            <span class="mono-tag">STEP 08 OF 08</span>
+            <span class="mono-tag green">READY FOR SYNTHESIS</span>
+          </div>
+          <h2 class="step-main-title">Review your site planner inputs</h2>
+          <p class="step-lead-desc">Verify your project blueprint before initiating the geospatial demand modeling, grid
+            audit, and financial sensitivity engine.</p>
+        </div>
+
+        <table class="review-summary-table">
+          <tbody id="review-summary-tbody">
+            <!-- Dynamically populated by app.js -->
+          </tbody>
+        </table>
+
+        <div class="step-card-footer">
+          <button type="button" class="btn btn-secondary" data-action="prev-step">Back</button>
+          <button type="button" class="btn btn-primary" id="btn-submit-analysis"
+            style="font-size:1rem;padding:12px 28px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+            </svg>
+            Generate Site Feasibility Dashboard
+          </button>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- =================================================================
+         PROCESSING STATE (Animated Sequential Status)
+         ================================================================= -->
+    <div id="processing-view" class="processing-overlay">
+      <div class="processing-spinner"></div>
+      <h3 class="processing-headline">Synthesizing EVision Site Analysis...</h3>
+      <p style="font-size:0.875rem;color:var(--text-secondary);max-width:460px;margin:0 auto;">
+        Querying VAHAN vehicle registry, MoRTH traffic telematics, and CEA grid substation headroom databases.
+      </p>
+
+      <ul class="processing-log-list">
+        <li class="processing-log-item active" id="proc-log-1">
+          <span class="log-icon">⟳</span>
+          <span>Analyzing charging demand & traffic volume...</span>
+        </li>
+        <li class="processing-log-item" id="proc-log-2">
+          <span class="log-icon">○</span>
+          <span>Finding relevant RTOs & VAHAN registration density...</span>
+        </li>
+        <li class="processing-log-item" id="proc-log-3">
+          <span class="log-icon">○</span>
+          <span>Calculating grid substation headroom & hotspot scores...</span>
+        </li>
+        <li class="processing-log-item" id="proc-log-4">
+          <span class="log-icon">○</span>
+          <span>Synthesizing CapEx & financial ROI sensitivity models...</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- =================================================================
+         PART 2: THE RESULTS DASHBOARD (100% JSON-Driven)
+         ================================================================= -->
+    <main id="dashboard-view" class="dashboard-section">
+
+      <!-- Top Dashboard Header Banner -->
+      <div class="dashboard-top-banner">
+        <div class="dashboard-header-left">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span class="mono-tag orange">FEASIBILITY REPORT</span>
+            <span class="mono-tag green">VERIFIED DATASET</span>
+          </div>
+          <h1 class="dashboard-site-title" id="dash-site-title">Selected Site Location</h1>
+          <div class="dashboard-header-meta">
+            <span id="dash-meta-coords">LAT: 18.8242° N, LNG: 73.2845° E</span>
+            <span>•</span>
+            <span id="dash-meta-radius">ANALYSIS CATCHMENT: 5 KM RADIUS</span>
+            <span>•</span>
+            <span id="dash-meta-id">ASSESSMENT ID: EVI-849201</span>
+          </div>
+        </div>
+
+        <div class="dashboard-header-right">
+          <a href="../landing.html" class="btn btn-secondary" id="btn-dash-back-landing" style="display:inline-flex;text-decoration:none;align-items:center;gap:6px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Landing Page
+          </a>
+          <button type="button" class="btn btn-secondary" id="btn-dash-to-questionnaire" onclick="document.getElementById('dashboard-view').classList.remove('active', 'detail-mode'); document.getElementById('questionnaire-view').style.display = 'block'; window.EVisionPlannerApp && window.EVisionPlannerApp.goToStep(0);" style="display:inline-flex;align-items:center;gap:6px;border-color:var(--accent-orange);color:var(--accent-orange);font-weight:700;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M9 11l3 3L22 4" />
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+            </svg>
+            Start Questionnaire
+          </button>
+          <!-- Detail Toggle -->
+          <button type="button" class="btn btn-detail-toggle" id="btn-detail-toggle" aria-pressed="false">
+            <svg class="icon-expand" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2.5">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            <svg class="icon-collapse" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2.5" style="display:none;">
+              <path d="M5 12h14" />
+            </svg>
+            <span class="toggle-label">Full Report</span>
+          </button>
+          <button type="button" class="btn btn-secondary" id="btn-open-report-modal">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+            </svg>
+            Export
+          </button>
+        </div>
+      </div>
+
+      <!-- ROW 1: Section A (Feasibility Score) + Section B (EV Demand) -->
+      <div class="dashboard-grid-2col">
+
+        <!-- SECTION A: SITE FEASIBILITY SCORE -->
+        <article class="dash-card reveal-el">
+          <div class="dash-card-header">
+            <div class="dash-card-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-orange)"
+                stroke-width="2.5">
+                <circle cx="12" cy="12" r="10" />
+                <path d="m9 12 2 2 4-4" />
+              </svg>
+              Site Feasibility Score
+            </div>
+            <span class="mono-tag green" id="dash-score-grade">A+ EXCELLENT</span>
+          </div>
+
+          <div class="score-hero-container">
+            <div class="score-radial-box">
+              <div class="big-score-num" id="dash-overall-score">91</div>
+              <div class="big-score-out-of">OVERALL INDEX / 100</div>
+            </div>
+            <div class="score-hero-text">
+              <h4 id="dash-score-headline">High Potential Charging Site</h4>
+              <p>
+                Calculated across 6 foundational pillars including local EV catchment density, grid substation headroom,
+                road exposure, and competitor charging deficits.
+              </p>
+            </div>
+          </div>
+
+          <!-- Score Sub-bars: detail only -->
+          <div class="detail-content">
+            <div class="score-subbars-list" id="dash-subbars-list">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </article>
+
+        <!-- SECTION B: LOCAL EV DEMAND -->
+        <article class="dash-card reveal-el" style="--reveal-delay:80ms;">
+          <div class="dash-card-header">
+            <div class="dash-card-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+              Local EV Demand & Catchment
+            </div>
+            <span class="mono-tag">VAHAN 2024</span>
+          </div>
+
+          <div class="stats-metrics-grid">
+            <div class="metric-box reveal-el" data-reveal-group="stats">
+              <div class="metric-title">Catchment Population</div>
+              <div class="metric-number" id="metric-pop-count">360,000</div>
+              <div class="data-source-note">[CENSUS 2021 / GEO 2024]</div>
+            </div>
+
+            <div class="metric-box reveal-el" data-reveal-group="stats">
+              <div class="metric-title">Registered EVs</div>
+              <div class="metric-number" id="metric-ev-count">17,280</div>
+              <div class="data-source-note">[VAHAN RTO AUDIT]</div>
+            </div>
+
+            <div class="metric-box reveal-el" data-reveal-group="stats">
+              <div class="metric-title">EV Penetration Rate</div>
+              <div class="metric-number" id="metric-ev-pen">4.8%</div>
+              <div class="data-source-note">[TOTAL VEHICLE SHARE]</div>
+            </div>
+
+            <div class="metric-box reveal-el" data-reveal-group="stats">
+              <div class="metric-title">YoY Adoption Growth</div>
+              <div class="metric-number" id="metric-ev-cagr" style="color:var(--color-green);">+44.5%</div>
+              <div class="data-source-note">[STATE VAHAN GROWTH]</div>
+            </div>
+          </div>
+
+          <!-- Vehicle breakdown: detail only -->
+          <div class="detail-content">
+            <div class="form-label" style="margin-top:18px;">Registered EV Population Breakdown by Class</div>
+            <div class="vehicle-breakdown-list" id="dash-vehicle-breakdown">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- SECTION F: RECOMMENDED DEPLOYMENT MODEL (HERO) -->
+      <section class="deployment-hero-card reveal-el">
+        <div class="deployment-header-row">
+          <div>
+            <span class="mono-tag dark" id="dash-deploy-category">TRANSIT HIGHWAY OASIS</span>
+            <h3 class="deployment-title" id="dash-deploy-title" style="margin-top:8px;">Petrol Pump Integrated
+              Dual-Speed EV Hub</h3>
+          </div>
+          <span class="mono-tag green" id="dash-deploy-badge">OPTIMAL ROI PROFILE</span>
+        </div>
+
+        <p class="deployment-summary" id="dash-deploy-summary">
+          Deploying high-speed dual-gun DC chargers alongside customer amenities captures captive intercity passenger
+          and fleet charging demand with minimal civil lead time.
+        </p>
+
+        <div class="reasons-grid" id="dash-deploy-reasons">
+          <!-- Rendered by JS -->
+        </div>
+      </section>
+
+      <!-- ROW 2: Section C (Traffic), Section D (Competition), Section E (Grid) -->
+      <div class="dashboard-grid-3col">
+
+        <!-- SECTION C: TRAFFIC & MOBILITY -->
+        <article class="dash-card reveal-el">
+          <div class="dash-card-header">
+            <div class="dash-card-title">Traffic & Mobility</div>
+            <span class="status-pill-badge status-good" id="dash-traffic-badge">VERY HIGH EXPOSURE</span>
+          </div>
+
+          <div class="metric-box" style="margin-bottom:14px;">
+            <div class="metric-title">Daily Passing Traffic</div>
+            <div class="metric-number" id="traffic-daily-passby">38,500 vehicles/day</div>
+            <div class="data-source-note">[MoRTH HIGHWAY CENSUS 2024]</div>
+          </div>
+
+          <!-- Traffic detail bullets: detail only -->
+          <div class="detail-content">
+            <ul class="info-bullet-list">
+              <li class="info-bullet-item">
+                <span class="bullet-dot"></span>
+                <div><strong>Road Classification:</strong> <span id="traffic-road-type">National Highway / 6-Lane
+                    Expressway</span></div>
+              </li>
+              <li class="info-bullet-item">
+                <span class="bullet-dot"></span>
+                <div><strong>Peak Charging Windows:</strong> <span id="traffic-peak-hours">08:00–11:30 &
+                    16:30–21:30</span></div>
+              </li>
+              <li class="info-bullet-item">
+                <span class="bullet-dot"></span>
+                <div><strong>Site Ingress:</strong> <span id="traffic-ingress">Excellent — Dedicated slip lane with zero
+                    curb obstruction</span></div>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- SECTION E: GRID FEASIBILITY -->
+        <article class="dash-card reveal-el" style="--reveal-delay:80ms;">
+          <div class="dash-card-header">
+            <div class="dash-card-title">Grid & Substation Audit</div>
+            <span class="status-pill-badge status-good" id="dash-grid-badge">SUITABLE</span>
+          </div>
+
+          <div class="metric-box" style="margin-bottom:14px;">
+            <div class="metric-title">Nearest 11kV Substation</div>
+            <div style="font-weight:700;font-size:1rem;margin-top:2px;" id="grid-substation-name">110/33/11 kV
+              MahaVitaran Substation</div>
+            <div class="data-source-note">[CEA NATIONAL SUBSTATION REGISTRY]</div>
+          </div>
+
+          <!-- Grid detail bullets: detail only -->
+          <div class="detail-content">
+            <ul class="info-bullet-list">
+              <li class="info-bullet-item">
+                <span class="bullet-dot"></span>
+                <div><strong>Distance from Property:</strong> <span id="grid-distance">0.9 km</span></div>
+              </li>
+              <li class="info-bullet-item">
+                <span class="bullet-dot"></span>
+                <div><strong>Available Grid Headroom:</strong> <span id="grid-headroom">650 kVA Spare Capacity</span>
+                </div>
+              </li>
+              <li class="info-bullet-item">
+                <span class="bullet-dot"></span>
+                <div><strong>Discom Sanction Timeline:</strong> <span id="grid-sanction-timeline">Fast-Tracked within 21
+                    Days</span></div>
+              </li>
+              <li class="info-bullet-item">
+                <span class="bullet-dot"></span>
+                <div><strong>Feeder Status:</strong> <span id="grid-feeder-notes">Dedicated 11kV line runs within
+                    180m</span></div>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- SECTION D: COMPETITION GAP -->
+        <article class="dash-card reveal-el" style="--reveal-delay:160ms;">
+          <div class="dash-card-header">
+            <div class="dash-card-title">Competition & Gap Read</div>
+            <span class="mono-tag orange">SUPPLY OPPORTUNITY</span>
+          </div>
+
+          <p style="font-size:0.8125rem;color:var(--text-secondary);margin-bottom:14px;line-height:1.45;"
+            id="comp-gap-summary">
+            Moderate competition with high unmet demand for reliable 60kW+ DC fast charging. Nearby stations report
+            25-40 min wait times during evening peaks.
+          </p>
+
+          <div class="metric-box" style="background:var(--color-green-bg);border-color:var(--color-green-border);">
+            <div class="metric-title" style="color:var(--color-green);">EVision Opportunity Read</div>
+            <div style="font-size:0.8125rem;color:var(--text-primary);margin-top:2px;line-height:1.4;">
+              Low high-power DC availability in a 5km radius makes this an ideal first-mover transit fast-charging
+              opportunity.
+            </div>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- SECTION D (TABLE): NEARBY COMPETITORS -->
+      <div class="detail-content">
+        <article class="dash-card dashboard-grid-full reveal-el">
+          <div class="dash-card-header">
+            <div class="dash-card-title">Existing Charging Infrastructure within Catchment Radius</div>
+            <span class="data-source-note">[OPEN CHARGE MAP & REGULATORY FILINGS 2024]</span>
+          </div>
+
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Station & Operator</th>
+                  <th>Distance</th>
+                  <th>Charger Equipment</th>
+                  <th>Average Utilization</th>
+                  <th>Competitive Vulnerability / Opportunity</th>
+                </tr>
+              </thead>
+              <tbody id="dash-comp-table-body">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+
+      <!-- ROW 3: Section G (CapEx Breakdown) + Section H (Live Financial Simulator) -->
+      <div class="dashboard-grid-2col">
+
+        <!-- SECTION G: INVESTMENT CAPEX BREAKDOWN -->
+        <article class="dash-card reveal-el">
+          <div class="dash-card-header">
+            <div class="dash-card-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <line x1="2" y1="10" x2="22" y2="10" />
+              </svg>
+              CapEx Investment Breakdown
+            </div>
+            <span class="mono-tag">[MODELED ESTIMATE]</span>
+          </div>
+
+          <div class="capex-total-banner">
+            <div>
+              <div class="metric-title">Estimated Total Project CapEx</div>
+              <div class="capex-big-range" id="capex-range-text">₹38.5 – ₹44.2 Lakhs</div>
+            </div>
+            <span class="mono-tag green">TURNKEY ESTIMATE</span>
+          </div>
+
+          <div class="capex-bar-stacked">
+            <div class="capex-seg capex-seg-1" style="width:54%;" title="EVSE Hardware 54%"></div>
+            <div class="capex-seg capex-seg-2" style="width:18%;" title="Transformer & HT 18%"></div>
+            <div class="capex-seg capex-seg-3" style="width:10%;" title="Civil Works 10%"></div>
+            <div class="capex-seg capex-seg-4" style="width:8%;" title="Discom Deposit 8%"></div>
+            <div class="capex-seg capex-seg-5" style="width:5%;" title="Contingency 5%"></div>
+            <div class="capex-seg capex-seg-6" style="width:3%;" title="Software 3%"></div>
+            <div class="capex-seg capex-seg-7" style="width:2%;" title="Statutory NOCs 2%"></div>
+          </div>
+
+          <!-- CapEx breakdown detail: detail only -->
+          <div class="detail-content">
+            <div class="capex-list" id="dash-capex-list">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </article>
+
+        <!-- SECTION H: FINANCIAL ESTIMATE & LIVE SIMULATOR -->
+        <article class="dash-card reveal-el" style="--reveal-delay:80ms;">
+          <div class="dash-card-header">
+            <div class="dash-card-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="1" x2="12" y2="23" />
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+              </svg>
+              Live Financial ROI Simulator
+            </div>
+            <span class="mono-tag orange">INTERACTIVE SENSITIVITY</span>
+          </div>
+
+          <div class="calc-layout">
+            <!-- Sliders — always visible (2 primary) + detail extras -->
+            <div class="calc-controls-col">
+              <div class="slider-group">
+                <div class="slider-label-row">
+                  <span class="form-label" style="margin-bottom:0;">Electricity Purchase Tariff</span>
+                  <span class="slider-val-badge" id="badge-val-tariff">₹6.80 / kWh</span>
+                </div>
+                <input type="range" class="range-slider" id="slider-tariff" min="4.50" max="11.00" step="0.10"
+                  value="6.80">
+              </div>
+
+              <div class="slider-group">
+                <div class="slider-label-row">
+                  <span class="form-label" style="margin-bottom:0;">Retail Selling Price to Driver</span>
+                  <span class="slider-val-badge" id="badge-val-price">₹18.50 / kWh</span>
+                </div>
+                <input type="range" class="range-slider" id="slider-selling-price" min="12.00" max="26.00" step="0.50"
+                  value="18.50">
+              </div>
+
+              <!-- Extra sliders: detail only -->
+              <div class="detail-content">
+                <div class="slider-group">
+                  <div class="slider-label-row">
+                    <span class="form-label" style="margin-bottom:0;">Expected Utilization Rate</span>
+                    <span class="slider-val-badge" id="badge-val-util">28% Capacity</span>
+                  </div>
+                  <input type="range" class="range-slider" id="slider-utilization" min="10" max="65" step="1"
+                    value="28">
+                </div>
+
+                <div class="slider-group">
+                  <div class="slider-label-row">
+                    <span class="form-label" style="margin-bottom:0;">Operating Days / Month</span>
+                    <span class="slider-val-badge" id="badge-val-days">30 Days</span>
+                  </div>
+                  <input type="range" class="range-slider" id="slider-days" min="24" max="31" step="1" value="30">
+                </div>
+              </div>
+            </div>
+
+            <!-- Dynamic Recalculated Output Box -->
+            <div class="calc-results-col">
+              <div class="calc-metrics-grid">
+                <div class="calc-metric-box">
+                  <div class="metric-title">Daily Dispensed Power</div>
+                  <div class="calc-metric-val" id="calc-daily-kwh">1,613 kWh</div>
+                </div>
+
+                <div class="calc-metric-box">
+                  <div class="metric-title">Monthly Gross Revenue</div>
+                  <div class="calc-metric-val" id="calc-monthly-rev">₹8.95L</div>
+                </div>
+
+                <div class="calc-metric-box">
+                  <div class="metric-title">Estimated Monthly Profit</div>
+                  <div class="calc-metric-val" id="calc-monthly-profit" style="color:var(--color-green);">₹4.78L</div>
+                </div>
+
+                <div class="calc-metric-box">
+                  <div class="metric-title">Annual ROI</div>
+                  <div class="calc-metric-val" id="calc-annual-roi" style="color:var(--color-green);">38%</div>
+                </div>
+              </div>
+
+              <div
+                style="background:var(--bg-white);border:1px solid var(--border-subtle);border-radius:6px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-weight:700;font-size:0.875rem;">Estimated Payback Period:</span>
+                <span class="mono-tag green" style="font-size:0.875rem;padding:4px 10px;" id="calc-payback-months">22 Mo
+                  (1.8 Yrs)</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- SECTION I & J: INTERACTIVE GEOSPATIAL MAP & SUB-LOCATION RECOMMENDATION ENGINE -->
+      <article class="dash-card dashboard-grid-full reveal-el">
+        <div class="dash-card-header">
+          <div class="dash-card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" />
+              <line x1="8" y1="2" x2="8" y2="18" />
+              <line x1="16" y1="6" x2="16" y2="22" />
+            </svg>
+            Interactive Geospatial Site Analysis & Sub-Location Recommendation Engine
+          </div>
+          <span class="mono-tag">[LEAFLET GEOSPATIAL ENGINE]</span>
+        </div>
+
+        <!-- Layer Toggles -->
+        <div class="map-layer-toggles-bar">
+          <span
+            style="font-size:0.75rem;color:var(--text-secondary);display:flex;align-items:center;font-weight:700;margin-right:4px;">Layer
+            Controls:</span>
+          <button type="button" class="layer-toggle-btn active" data-layer="radiusCircle">Catchment Radius (5
+            km)</button>
+          <button type="button" class="layer-toggle-btn active" data-layer="competitors">Competitor Stations</button>
+          <button type="button" class="layer-toggle-btn active" data-layer="alternatives">ROI-Ranked Candidate
+            Spots</button>
+          <button type="button" class="layer-toggle-btn active" data-layer="substations">11kV Grid Substations</button>
+        </div>
+
+        <!-- Interactive Map Container -->
+        <div id="dashboard-interactive-map" class="dashboard-map-container"></div>
+
+        <!-- Section I: Sub-Location Recommendations Engine -->
+        <div class="subloc-recommendation-panel">
+          <div class="subloc-panel-header">
+            <div>
+              <div class="subloc-panel-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-orange)"
+                  stroke-width="2">
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
+                Candidate Sub-Locations within Catchment (ROI-Ranked)
+              </div>
+              <p class="subloc-panel-desc">
+                High-yield candidate spots within your analyzed perimeter evaluated for capital efficiency, footfall
+                capture, and local real estate cost.
+              </p>
+            </div>
+
+            <!-- Sort Controls Bar -->
+            <div class="subloc-sort-controls">
+              <span class="subloc-sort-label">Sort by:</span>
+              <div class="subloc-sort-btn-group" role="group" aria-label="Sort Candidate Sub-Locations">
+                <button type="button" class="subloc-sort-btn active" data-sort="roi">Highest ROI</button>
+                <button type="button" class="subloc-sort-btn" data-sort="investment">Lowest Investment</button>
+                <button type="button" class="subloc-sort-btn" data-sort="demand">Highest Demand</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ranked Candidate List Grid -->
+          <div class="subloc-candidates-list" id="dash-alt-sites-grid">
+            <!-- Dynamically populated by app.js -->
+          </div>
+        </div>
+      </article>
+
+      <!-- =================================================================
+           3D VISION SPATIAL DIGITAL TWIN LAUNCHER CARD
+           ================================================================= -->
+      <article class="dash-card dashboard-grid-full reveal-el"
+        style="background: linear-gradient(135deg, #13151B 0%, #1A1D26 100%); border-color: var(--accent-orange); padding: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+              <span class="mono-tag orange">3D SPATIAL DIGITAL TWIN</span>
+              <span class="mono-tag green">LIVE THREE.JS STUDIO</span>
+            </div>
+            <h3 style="color: #FFFFFF; font-size: 1.25rem; font-weight: 800; margin: 0 0 6px 0;">3D Vision Facility
+              Blueprint Studio</h3>
+            <p style="color: var(--text-on-dark-muted); font-size: 0.875rem; margin: 0; max-width: 600px;">
+              Interact with the 2D CAD drafting grid and photorealistic 3D Three.js environment configured specifically
+              for your project layout.
+            </p>
+          </div>
+          <a href="3dvision.html" target="_blank" rel="noopener noreferrer" class="btn btn-primary"
+            style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;padding: 12px 24px; font-size: 0.95rem;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path
+                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+            </svg>
+            Launch 3D Vision Studio (New Tab ↗)
+          </a>
+        </div>
+      </article>
+
+      <!-- SECTION K: FINAL EXECUTIVE VERDICT CARD -->
+      <section class="verdict-card reveal-el">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <span class="mono-tag orange">EXECUTIVE INVESTMENT VERDICT</span>
+          <span class="mono-tag dark">RECOMMENDED SITE</span>
+        </div>
+
+        <h2 class="verdict-headline" id="verdict-headline-text">
+          Recommended for Immediate Development — Petrol Pump Integrated Dual-Speed EV Hub
+        </h2>
+
+        <div style="display:flex;gap:24px;flex-wrap:wrap;">
+          <div>
+            <span
+              style="font-size:0.75rem;color:var(--text-on-dark-muted);text-transform:uppercase;font-family:var(--font-mono);">CapEx
+              Envelope</span>
+            <div style="font-family:var(--font-mono);font-size:1.45rem;font-weight:800;color:#FFFFFF;"
+              id="verdict-inv-stat">₹38.5 – ₹44.2 Lakhs</div>
+          </div>
+          <div style="border-left:1px solid var(--border-dark);padding-left:24px;">
+            <span
+              style="font-size:0.75rem;color:var(--text-on-dark-muted);text-transform:uppercase;font-family:var(--font-mono);">Modeled
+              Payback</span>
+            <div style="font-family:var(--font-mono);font-size:1.45rem;font-weight:800;color:var(--color-green);"
+              id="verdict-payback-stat">1.8 Years (22 Months)</div>
+          </div>
+          <div style="border-left:1px solid var(--border-dark);padding-left:24px;">
+            <span
+              style="font-size:0.75rem;color:var(--text-on-dark-muted);text-transform:uppercase;font-family:var(--font-mono);">Projected
+              Net Profit</span>
+            <div style="font-family:var(--font-mono);font-size:1.45rem;font-weight:800;color:var(--accent-orange);"
+              id="verdict-profit-stat">₹4.78 Lakhs / mo</div>
+          </div>
+          <div style="border-left:1px solid var(--border-dark);padding-left:24px;">
+            <span
+              style="font-size:0.75rem;color:var(--text-on-dark-muted);text-transform:uppercase;font-family:var(--font-mono);">Est.
+              Land / Rent Cost</span>
+            <div style="font-family:var(--font-mono);font-size:1.15rem;font-weight:800;color:#FFFFFF;margin-top:4px;"
+              id="verdict-land-cost-stat">₹65–80 / sq.ft. / mo <span class="mono-tag"
+                style="font-size:0.65rem;padding:2px 6px;vertical-align:middle;">MODELED ESTIMATE</span></div>
+          </div>
+        </div>
+
+        <div class="verdict-columns">
+          <div class="verdict-col">
+            <h5>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-green)" stroke-width="3">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              Core Investment Advantages
+            </h5>
+            <ul class="verdict-bullet-list" id="verdict-drivers-list">
+              <!-- Rendered by JS -->
+            </ul>
+          </div>
+
+          <div class="verdict-col">
+            <h5>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-amber)"
+                stroke-width="2.5">
+                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+              Key Risks & Mitigation Factors
+            </h5>
+            <ul class="verdict-bullet-list" id="verdict-risks-list">
+              <!-- Rendered by JS -->
+            </ul>
+          </div>
+        </div>
+
+        <div class="verdict-actions-row">
+          <span style="font-size:0.8125rem;color:var(--text-on-dark-muted);">
+            Ready to proceed with Discom electrical filings and turnkey OEM equipment quotes?
+          </span>
+          <button type="button" class="btn btn-primary" id="btn-request-report"
+            onclick="document.getElementById('modal-report-dialog').classList.add('active');">
+            Request Detailed Site DPR Report
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- =================================================================
+       REPORT & EXPORT MODAL DIALOG
+       ================================================================= -->
+  <div class="modal-backdrop" id="modal-report-dialog">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 style="font-size:1.125rem;">Detailed Project Report (DPR) Export</h3>
+        <button type="button" class="modal-close-btn" id="btn-close-modal">✕</button>
+      </div>
+      <p style="font-size:0.875rem;color:var(--text-secondary);margin-bottom:20px;">
+        Generate an investor-ready site assessment dossier including single-line electrical SLDs, Discom sanction
+        application drafts, and equipment CapEx quotes.
+      </p>
+
+      <div class="form-group">
+        <label class="form-label">Recipient Email Address</label>
+        <input type="email" class="input-text" value="investor@evision.in" placeholder="name@company.com">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Report Format</label>
+        <div class="options-grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="option-card selected"><span class="option-title">Comprehensive PDF Dossier (18 Pages)</span></div>
+          <div class="option-card"><span class="option-title">Financial Sensitivity Model (Excel)</span></div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:24px;">
+        <button type="button" class="btn btn-secondary" id="btn-print-report">Print Assessment</button>
+        <button type="button" class="btn btn-primary"
+          onclick="alert('DPR dossier queued for export. Sent to recipient email.'); document.getElementById('modal-report-dialog').classList.remove('active');">Send
+          Report Dossier</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet Map JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- Application Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+
+</html>

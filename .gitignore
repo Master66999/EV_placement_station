@@ -1,0 +1,19 @@
+# Large datasets & CSVs (>50MB)
+*.csv
+*.zip
+*.tar.gz
+
+# Python backend large input data
+python/**/input/
+python/Backend_EV_charging/**/input/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE & OS files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

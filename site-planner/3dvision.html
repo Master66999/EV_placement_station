@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EVision 3D Vision — Interactive 2D/3D EV Facility CAD Studio</title>
+  <meta name="description"
+    content="Professional 2D CAD blueprint spatial planner and photorealistic 3D Three.js architectural visualizer for EV charging stations.">
+
+  <!-- Google Fonts: Plus Jakarta Sans & Space Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
+    rel="stylesheet">
+
+  <!-- EVision Theme & 3D Vision Stylesheets -->
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/vision3d.css">
+
+  <!-- Three.js & OrbitControls from CDN -->
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+
+<body class="vision-standalone-page">
+
+  <!-- =================================================================
+       STANDALONE STUDIO HEADER BAR (Dark Precision CAD Interface)
+       ================================================================= -->
+  <header class="vision-standalone-header">
+    <div class="vision-header-branding">
+      <a href="dashboard.html" class="vision-back-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M19 12H5M12 19l-7-7 7-7" />
+        </svg>
+        <span>Dashboard</span>
+      </a>
+      <div class="vision-header-divider"></div>
+      <div class="vision-brand-meta">
+        <div class="vision-brand-row">
+          <strong class="vision-brand-title">EVISION 3D STUDIO</strong>
+          <span class="vision-badge orange">V2.4 SPATIAL TWIN</span>
+          <span class="vision-badge green">LIVE THREE.JS</span>
+        </div>
+        <div class="vision-brand-subtitle">2D CAD BLUEPRINT & 3D ARCHITECTURAL GENERATOR</div>
+      </div>
+    </div>
+
+    <!-- Header Toolbar Controls -->
+    <div class="vision-toolbar">
+      <!-- Plot Dimensions -->
+      <div class="vision-control-pill">
+        <label for="vision-plot-w">W:</label>
+        <input type="number" id="vision-plot-w" value="52" min="10" max="200">
+        <span>m</span>
+        <label for="vision-plot-d">D:</label>
+        <input type="number" id="vision-plot-d" value="36" min="10" max="200">
+        <span>m</span>
+        <button type="button" id="vision-btn-apply-plot" class="vision-btn-apply">Apply</button>
+      </div>
+
+      <!-- Presets -->
+      <div class="vision-control-pill">
+        <label for="vision-preset-select">Preset:</label>
+        <select id="vision-preset-select"></select>
+      </div>
+
+      <!-- Lighting Mode -->
+      <div class="vision-control-pill">
+        <label for="vision-time-of-day">Light:</label>
+        <select id="vision-time-of-day">
+          <option value="day">☀️ Day Light</option>
+          <option value="sunset">🌅 Sunset Gold</option>
+          <option value="night">🌙 Cyber Night</option>
+        </select>
+      </div>
+
+      <!-- View Modes -->
+      <div class="vision-view-tabs">
+        <button type="button" class="vision-tab-btn active" id="vision-tab-split">Split 50/50</button>
+        <button type="button" class="vision-tab-btn" id="vision-tab-2d">2D CAD</button>
+        <button type="button" class="vision-tab-btn" id="vision-tab-3d">3D View</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- =================================================================
+       MAIN 3-COLUMN STUDIO WORKSPACE
+       ================================================================= -->
+  <div class="vision-workspace">
+    <!-- LEFT COLUMN: Facility Catalog Palette -->
+    <aside class="vision-palette-sidebar">
+      <div class="vision-palette-header">
+        <button type="button" class="vision-palette-toggle" id="vision-palette-toggle"
+          title="Toggle Facility Palette (Collapse/Expand)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+        <span class="vision-palette-title">🧩 Facility Palette</span>
+        <span class="mono-tag" style="font-size:0.65rem;padding:2px 6px;">DRAG / CLICK</span>
+      </div>
+      <div class="vision-palette-items" id="vision-palette-list">
+        <!-- Rendered dynamically by vision3d.js -->
+      </div>
+    </aside>
+
+    <!-- CENTER COLUMN: Viewports Split Container -->
+    <main class="vision-viewports-container mode-split" id="vision-viewports-container">
+      <!-- 2D Blueprint Canvas Viewport -->
+      <div class="vision-viewport-panel panel-2d">
+        <div class="vision-canvas-tag">📐 2D CAD BLUEPRINT CANVAS</div>
+        <canvas id="vision-blueprint-canvas"></canvas>
+      </div>
+
+      <!-- 3D Three.js Scene Viewport -->
+      <div class="vision-viewport-panel panel-3d">
+        <div class="vision-canvas-tag">🧊 3D THREE.JS SPATIAL TWIN</div>
+        <div id="vision-walkthrough-hud" class="vision-walkthrough-hud" style="display:none;">
+          🕹️ Click canvas to start walkthrough • WASD to move • Mouse to look • ESC to exit
+        </div>
+        <div id="vision-3d-viewport"></div>
+
+        <!-- 3D Camera Controls Overlay -->
+        <div class="vision-camera-controls">
+          <button type="button" class="vision-cam-btn" id="vision-cam-top">Top CAD</button>
+          <button type="button" class="vision-cam-btn active" id="vision-cam-iso">Iso 45°</button>
+          <button type="button" class="vision-cam-btn" id="vision-cam-walk">Walkthrough</button>
+          <button type="button" class="vision-cam-btn" id="vision-cam-tour">🔄 3D Tour</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- RIGHT COLUMN: Inspector, Real-Time Analytics & Exporters -->
+    <aside class="vision-sidebar-right">
+      <!-- Property Inspector Section -->
+      <div class="vision-sidebar-section">
+        <div class="vision-section-heading">
+          <span>🔧 Property Inspector</span>
+          <span class="mono-tag orange" style="font-size:0.62rem;padding:1px 5px;">LIVE</span>
+        </div>
+        <div id="vision-inspector-empty" class="vision-inspector-empty">
+          Select any facility on the 2D blueprint to edit dimensions, rotation & color
+        </div>
+        <div id="vision-inspector-form" style="display:none;">
+          <div class="vision-form-row single">
+            <div class="vision-field">
+              <label for="vision-item-name">Facility Name</label>
+              <input type="text" id="vision-item-name">
+            </div>
+          </div>
+
+          <div class="vision-form-row">
+            <div class="vision-field">
+              <label for="vision-item-w">Width (m)</label>
+              <input type="number" id="vision-item-w" step="0.5" min="1">
+            </div>
+            <div class="vision-field">
+              <label for="vision-item-d">Depth (m)</label>
+              <input type="number" id="vision-item-d" step="0.5" min="1">
+            </div>
+          </div>
+
+          <div class="vision-form-row">
+            <div class="vision-field">
+              <label for="vision-item-h">Height (m)</label>
+              <input type="number" id="vision-item-h" step="0.2" min="0.1">
+            </div>
+            <div class="vision-field">
+              <label for="vision-item-rot">Rotation (°)</label>
+              <input type="number" id="vision-item-rot" step="15" min="0" max="360">
+            </div>
+          </div>
+
+          <div class="vision-form-row single">
+            <div class="vision-field">
+              <label for="vision-item-col">Accent Color</label>
+              <input type="color" id="vision-item-col" style="height:30px;padding:2px;cursor:pointer;">
+            </div>
+          </div>
+
+          <div class="vision-inspector-actions">
+            <button type="button" id="vision-btn-duplicate" class="vision-btn-sm vision-btn-copy">📋 Duplicate</button>
+            <button type="button" id="vision-btn-delete" class="vision-btn-sm vision-btn-del">🗑️ Delete</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Real-Time Site Analytics Section -->
+      <div class="vision-sidebar-section">
+        <div class="vision-section-heading">
+          <span>📊 Spatial & Power Analytics</span>
+        </div>
+        <div class="vision-analytics-grid">
+          <div class="vision-stat-card">
+            <div class="vision-stat-label">Plot Area</div>
+            <div class="vision-stat-val" id="vision-stat-plot-area">1,872 m²</div>
+          </div>
+          <div class="vision-stat-card">
+            <div class="vision-stat-label">Built Coverage</div>
+            <div class="vision-stat-val" id="vision-stat-built-area">210 m² (11.2%)</div>
+          </div>
+          <div class="vision-stat-card">
+            <div class="vision-stat-label">Green Space</div>
+            <div class="vision-stat-val" id="vision-stat-green-area">80 m²</div>
+          </div>
+          <div class="vision-stat-card">
+            <div class="vision-stat-label">EV Power Load</div>
+            <div class="vision-stat-val" id="vision-stat-ev-power">840 kW</div>
+          </div>
+          <div class="vision-stat-card">
+            <div class="vision-stat-label">Vehicle Bays</div>
+            <div class="vision-stat-val" id="vision-stat-stalls">12 Bays</div>
+          </div>
+          <div class="vision-stat-card full-width">
+            <div class="vision-stat-label">Modeled Layout CapEx</div>
+            <div class="vision-stat-val" id="vision-stat-cost">₹41.8 Lakhs</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Blueprint Exporter Section -->
+      <div class="vision-sidebar-section">
+        <div class="vision-section-heading">
+          <span>💾 Blueprint Exporter</span>
+        </div>
+        <div class="vision-export-list">
+          <button type="button" class="vision-export-btn" id="vision-export-2d">
+            <span>📐</span> Export 2D Blueprint (PNG)
+          </button>
+          <button type="button" class="vision-export-btn" id="vision-export-3d">
+            <span>📷</span> Export 3D Render (PNG)
+          </button>
+          <button type="button" class="vision-export-btn" id="vision-save-json">
+            <span>💾</span> Save Layout (JSON)
+          </button>
+          <button type="button" class="vision-export-btn" id="vision-load-json">
+            <span>📂</span> Load Layout (JSON)
+          </button>
+          <input type="file" id="vision-file-input-json" accept=".json" style="display:none;">
+          <button type="button" class="vision-export-btn danger" id="vision-clear-all">
+            <span>🗑️</span> Reset Blueprint
+          </button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Vision 3D Engine Script -->
+  <script src="js/vision3d.js"></script>
+</body>
+
+</html>
