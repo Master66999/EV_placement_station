@@ -48,7 +48,7 @@
 
     function isCurrentInSubfolder() {
         const p = window.location.pathname.toLowerCase();
-        return p.includes('evision_india_') || p.includes('/evision_india_') || p.includes('\\evision_india_');
+        return p.includes('/site-planner/') || p.includes('\\site-planner\\') || p.includes('evision_india_');
     }
 
     function resolvePath(targetRel) {
@@ -64,7 +64,7 @@
         const normKey = key.toLowerCase().trim();
 
         if (normKey === 'home' || normKey === 'landing' || normKey === 'landing page' || normKey === 'landing overview') {
-            const target = resolvePath('index.html');
+            const target = resolvePath('landing.html');
             if (window.self !== window.top) {
                 window.top.location.href = target;
             } else {
@@ -73,12 +73,18 @@
             return true;
         }
 
-        if (normKey === 'command center' || normKey === 'command' || normKey === 'dashboard' || normKey === 'master command' || normKey === 'national overview') {
-            if (window.self !== window.top && window.parent && typeof window.parent.closeModule === 'function') {
-                window.parent.closeModule();
-                return true;
+        if (normKey === 'dashboard' || normKey === 'site planner' || normKey === 'site-planner' || normKey === 'planner' || normKey === 'ai site planner' || normKey === 'ai site feasibility' || normKey === 'site analysis' || normKey === 'site ai' || normKey === 'evaluate station site' || normKey === 'find best location') {
+            const target = resolvePath('site-planner/dashboard.html');
+            if (window.self !== window.top) {
+                window.top.location.href = target;
+            } else {
+                window.location.href = target;
             }
-            const target = resolvePath('index.html');
+            return true;
+        }
+
+        if (normKey === '3d' || normKey === '3d vision' || normKey === '3d cad' || normKey === '3d spatial') {
+            const target = resolvePath('site-planner/3dvision.html');
             if (window.self !== window.top) {
                 window.top.location.href = target;
             } else {
@@ -100,8 +106,7 @@
                 }
                 return true;
             }
-            // For all other modules, they are dashboard pages and are excluded, so redirect to index.html (landing)
-            const targetUrl = resolvePath('index.html');
+            const targetUrl = resolvePath('site-planner/dashboard.html');
             if (window.self !== window.top) {
                 window.top.location.href = targetUrl;
             } else {

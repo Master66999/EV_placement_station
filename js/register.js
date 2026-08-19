@@ -90,26 +90,72 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function handleLoginSubmit(e) {
   e.preventDefault();
-  const email = document.getElementById('signin-email').value;
+  const emailElem = document.getElementById('signin-email');
+  const passElem = document.getElementById('signin-password');
+
+  const email = emailElem ? emailElem.value.trim() : '';
+  const password = passElem ? passElem.value : '';
+
+  if (!email) {
+    alert('Please enter your operator email.');
+    return;
+  }
+  if (!password) {
+    alert('Please enter your security key / password.');
+    return;
+  }
+
   localStorage.setItem('evision_user', JSON.stringify({
     email: email,
-    role: 'Operator',
+    role: 'Station Operator',
+    isLoggedIn: true,
     authenticatedAt: new Date().toISOString()
   }));
-  window.location.href = 'landing.html';
+
+  // Direct redirect to AI Charging Site Planner Dashboard
+  window.location.href = 'site-planner/dashboard.html';
 }
 
 function handleRegisterSubmit(e) {
   e.preventDefault();
-  const name = document.getElementById('reg-name').value;
-  const email = document.getElementById('reg-email').value;
+  const nameElem = document.getElementById('reg-name');
+  const emailElem = document.getElementById('reg-email');
+  const passElem = document.getElementById('reg-password');
+  const confirmPassElem = document.getElementById('reg-confirm-password');
+
+  const name = nameElem ? nameElem.value.trim() : '';
+  const email = emailElem ? emailElem.value.trim() : '';
+  const password = passElem ? passElem.value : '';
+  const confirmPassword = confirmPassElem ? confirmPassElem.value : '';
+
+  if (!name || !email) {
+    alert('Please fill in your name and email.');
+    return;
+  }
+
+  if (!password || !confirmPassword) {
+    alert('Please enter and confirm your password.');
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    alert('Passwords do not match. Please re-enter your password.');
+    return;
+  }
+
+  if (password.length < 6) {
+    alert('Password must be at least 6 characters long.');
+    return;
+  }
 
   localStorage.setItem('evision_user', JSON.stringify({
     name: name,
     email: email,
     role: 'Station Operator',
+    isLoggedIn: true,
     registeredAt: new Date().toISOString()
   }));
 
-  window.location.href = 'landing.html';
+  // Direct redirect to AI Charging Site Planner Dashboard
+  window.location.href = 'site-planner/dashboard.html';
 }
