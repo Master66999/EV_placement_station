@@ -60,6 +60,14 @@
           </svg>
           Landing Page
         </a>
+        <button type="button" class="btn btn-primary btn-sm" id="btn-direct-dashboard"
+          onclick="if(window.EVisionPlannerApp) window.EVisionPlannerApp.runAnalysis();"
+          style="display:inline-flex;align-items:center;gap:6px;background:var(--accent-orange);border-color:var(--accent-orange);color:#ffffff;font-weight:700;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+          </svg>
+          View Live Station Dashboard
+        </button>
         <span class="mono-tag green">v2.4 INDIAN MOBILITY ENGINE</span>
         <button type="button" class="btn btn-secondary btn-sm" id="btn-replan-site" style="display:inline-flex;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -707,7 +715,7 @@
 
         <div class="step-card-footer">
           <button type="button" class="btn btn-secondary" data-action="prev-step">Back</button>
-          <button type="button" class="btn btn-primary" id="btn-submit-analysis"
+          <button type="button" class="btn btn-primary" id="btn-submit-analysis" onclick="if(window.EVisionPlannerApp) window.EVisionPlannerApp.runAnalysis(); return false;"
             style="font-size:1rem;padding:12px 28px;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
@@ -1272,6 +1280,98 @@
             </svg>
             Launch 3D Vision Studio (New Tab ↗)
           </a>
+        </div>
+      </article>
+
+      <!-- =================================================================
+           SECTION: CAPEX & OPEX COST OPTIMIZATION STRATEGIES
+           ================================================================= -->
+      <article class="dash-card dashboard-grid-full reveal-el" id="dash-cost-cutting-card">
+        <div class="dash-card-header">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+              <span class="mono-tag green">COST REDUCTION BLUEPRINT</span>
+              <span class="mono-tag orange">UP TO ₹8.5L CAPEX SAVINGS</span>
+            </div>
+            <div class="dash-card-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" stroke-width="2.5">
+                <line x1="12" y1="1" x2="12" y2="23"/>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+              Smart Cost-Cutting & Capital Optimization Strategies
+            </div>
+            <p class="dash-card-subtitle">Actionable engineering & policy levers to minimize initial equipment CapEx, lower monthly DISCOM power bills, and shorten ROI payback.</p>
+          </div>
+        </div>
+
+        <!-- 3-Box Savings Highlight Metrics Grid (Uses subloc-metrics-grid for 100% Theme Match) -->
+        <div class="subloc-metrics-grid" style="margin-bottom:20px;">
+          <div class="subloc-metric-box" style="background: rgba(0, 230, 153, 0.06); border-color: rgba(0, 230, 153, 0.25);">
+            <span class="subloc-metric-lbl">Potential CapEx Reduction</span>
+            <div class="subloc-metric-val text-green" id="cost-save-capex" style="font-size: 1.4rem;">₹3.50L – ₹8.50L</div>
+            <span class="subloc-metric-sub text-green">PM E-DRIVE Subsidy & IT Sec 32 Tax Write-off</span>
+          </div>
+
+          <div class="subloc-metric-box" style="background: rgba(255, 140, 0, 0.06); border-color: rgba(255, 140, 0, 0.25);">
+            <span class="subloc-metric-lbl">Monthly OpEx Reduction</span>
+            <div class="subloc-metric-val text-orange" id="cost-save-opex" style="font-size: 1.4rem;">28% – 35% Lower</div>
+            <span class="subloc-metric-sub text-orange">30kW Solar Net-Metering & Night TOD Tariff</span>
+          </div>
+
+          <div class="subloc-metric-box" style="background: rgba(56, 189, 248, 0.06); border-color: rgba(56, 189, 248, 0.25);">
+            <span class="subloc-metric-lbl">Accelerated Payback</span>
+            <div class="subloc-metric-val text-dark" id="cost-save-payback" style="font-size: 1.4rem; color: #38BDF8;">4.5 Months Faster</div>
+            <span class="subloc-metric-sub" style="color: #38BDF8;">Reduced Capital Recovery Horizon</span>
+          </div>
+        </div>
+
+        <!-- 4 Actionable Cost-Cutting Pillar Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+          
+          <div class="reason-box" style="border-left: 3px solid var(--accent-green);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <strong style="color: var(--accent-green); font-size: 0.78125rem; font-family: var(--font-mono);">01 • GOVT SUBSIDY & IT DEPRECIATION</strong>
+              <span class="mono-tag green">SAVE ₹3.5L – ₹5.0L</span>
+            </div>
+            <h4 style="margin: 0 0 6px 0; color: var(--text-primary); font-size: 0.9375rem;">PM E-DRIVE Capital Subsidy & 100% Depreciation</h4>
+            <p style="margin: 0; font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.5;">
+              Claim state EV policy capital subsidies on Fast DC equipment plus 100% Accelerated Depreciation under Income Tax Section 32 in Year 1, effectively cutting net hardware investment by 22–30%.
+            </p>
+          </div>
+
+          <div class="reason-box" style="border-left: 3px solid var(--accent-orange);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <strong style="color: var(--accent-orange); font-size: 0.78125rem; font-family: var(--font-mono);">02 • ROOFTOP SOLAR PV INTEGRATION</strong>
+              <span class="mono-tag orange">SAVE 28–35% OPEX</span>
+            </div>
+            <h4 style="margin: 0 0 6px 0; color: var(--text-primary); font-size: 0.9375rem;">30kW Canopy Solar Net-Metering</h4>
+            <p style="margin: 0; font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.5;">
+              Co-locate a 30kW rooftop solar array over charging bay canopies. Solar generation reduces daytime grid power consumption from ₹6.80/kWh down to ~₹2.10/kWh net-metered cost.
+            </p>
+          </div>
+
+          <div class="reason-box" style="border-left: 3px solid #38BDF8;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <strong style="color: #38BDF8; font-size: 0.78125rem; font-family: var(--font-mono);">03 • DYNAMIC LOAD MANAGEMENT (DLM)</strong>
+              <span class="mono-tag" style="background: rgba(56,189,248,0.15); color: #38BDF8;">AVOID ₹4.0L GRID COST</span>
+            </div>
+            <h4 style="margin: 0 0 6px 0; color: var(--text-primary); font-size: 0.9375rem;">Smart Peak Shaving & Load Sharing</h4>
+            <p style="margin: 0; font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.5;">
+              Implement OCPP 1.6J Smart Dynamic Load Sharing across chargers. This eliminates the need to pay expensive DISCOM 250kVA transformer upgrade fees, staying safely within 100kVA headroom.
+            </p>
+          </div>
+
+          <div class="reason-box" style="border-left: 3px solid #A855F7;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <strong style="color: #A855F7; font-size: 0.78125rem; font-family: var(--font-mono);">04 • CO-LOCATION LAND SHARING</strong>
+              <span class="mono-tag" style="background: rgba(168,85,247,0.15); color: #A855F7;">SAVE ₹1.5L CIVIL</span>
+            </div>
+            <h4 style="margin: 0 0 6px 0; color: var(--text-primary); font-size: 0.9375rem;">Petrol Pump / Mall Asset-Light Lease</h4>
+            <p style="margin: 0; font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.5;">
+              Co-locate with existing commercial properties or petrol pumps on revenue-share lease models. Share existing civil paving, lighting, 24/7 security, and amenities to minimize civil CapEx.
+            </p>
+          </div>
+
         </div>
       </article>
 
