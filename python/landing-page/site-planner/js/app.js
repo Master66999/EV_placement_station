@@ -73,6 +73,23 @@ class EVisionPlannerApp {
    */
   _loadOnboardingContext() {
     try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlLat = parseFloat(urlParams.get('lat'));
+      const urlLng = parseFloat(urlParams.get('lng'));
+      const urlLoc = urlParams.get('loc');
+      if (!isNaN(urlLat) && !isNaN(urlLng)) {
+        this.formData.coordinates = [urlLat, urlLng];
+        if (urlLoc) {
+          this.formData.locationName = decodeURIComponent(urlLoc);
+          const searchInput = document.getElementById('input-location-search');
+          if (searchInput) searchInput.value = decodeURIComponent(urlLoc);
+        }
+      }
+    } catch (e) {
+      console.warn('Could not parse URL query parameters:', e);
+    }
+
+    try {
       const stored = localStorage.getItem('evision_onboarding_project');
       if (!stored) return;
       const proj = JSON.parse(stored);

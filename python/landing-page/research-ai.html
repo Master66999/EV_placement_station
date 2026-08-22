@@ -1,0 +1,2218 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Research with AI — EVision EV Infrastructure Platform</title>
+  <meta name="description"
+    content="Explore locations, test station scenarios, and use AI to understand the best EV charging infrastructure opportunity." />
+
+  <!-- Google Fonts: Plus Jakarta Sans, Syne, Space Mono, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800;900&family=Space+Mono:wght@400;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg-page: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-subtle: #f1f5f9;
+      --bg-input: #ffffff;
+      --border-subtle: #e2e8f0;
+      --border-medium: #cbd5e1;
+      --border-focus: #ea650f;
+      --text-heading: #0f172a;
+      --text-body: #334155;
+      --text-muted: #64748b;
+      --accent-orange: #ea650f;
+      --accent-orange-hover: #d55708;
+      --accent-orange-light: rgba(234, 101, 15, 0.08);
+      --accent-green: #059669;
+      --accent-green-light: rgba(5, 150, 105, 0.08);
+      --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-heading: 'Syne', sans-serif;
+      --font-mono: 'Space Mono', monospace;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+      --shadow-active: 0 4px 16px rgba(234, 101, 15, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-body);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+    }
+
+    /* Layout Wrapper matching Site Planner */
+    .research-wrapper {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 24px 24px 80px 24px;
+    }
+
+    /* Header matching EVision Site Planner */
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 28px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .brand-section {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .brand-badge-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo-text {
+      font-family: var(--font-heading);
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      color: var(--text-heading);
+    }
+
+    .brand-logo-text span {
+      color: var(--accent-orange);
+    }
+
+    .brand-subtext {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .mono-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 4px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-body);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mono-tag.orange {
+      color: var(--accent-orange);
+      border-color: rgba(234, 101, 15, 0.35);
+      background: var(--accent-orange-light);
+    }
+
+    .mono-tag.green {
+      color: var(--accent-green);
+      border-color: rgba(5, 150, 105, 0.35);
+      background: var(--accent-green-light);
+    }
+
+    .btn {
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+
+    .btn-secondary {
+      background: #ffffff;
+      border: 1px solid var(--border-medium);
+      color: var(--text-body);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-subtle);
+      border-color: var(--text-muted);
+      color: var(--text-heading);
+    }
+
+    .btn-primary {
+      background: var(--accent-orange);
+      border: 1px solid var(--accent-orange);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-orange-hover);
+    }
+
+    /* Active Site Project Context Banner */
+    .active-project-banner {
+      background: #ffffff;
+      border: 1px solid var(--border-medium);
+      border-left: 4px solid var(--accent-orange);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .active-project-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .active-project-badge-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .active-project-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 12px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 12px 16px;
+    }
+
+    .proj-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 2px;
+    }
+
+    .proj-value {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-heading);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .proj-value.orange {
+      color: var(--accent-orange);
+    }
+
+    /* Hero Section */
+    .hero-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .hero-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent-orange);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 4px;
+    }
+
+    .hero-heading {
+      font-family: var(--font-heading);
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-heading);
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+      margin-bottom: 6px;
+    }
+
+    .hero-subtext {
+      font-size: 14px;
+      color: var(--text-muted);
+      max-width: 860px;
+      line-height: 1.5;
+    }
+
+    /* Four Feature Cards Grid */
+    .feature-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 1080px) {
+      .feature-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .feature-cards-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 220px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+
+    .feature-card:hover {
+      border-color: var(--border-medium);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .feature-card.selected-card {
+      border-color: var(--accent-orange);
+      box-shadow: var(--shadow-active);
+    }
+
+    .feature-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .feature-icon-box {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: var(--accent-orange-light);
+      border: 1px solid rgba(234, 101, 15, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-orange);
+    }
+
+    .feature-num {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    .feature-card.selected-card .feature-num {
+      color: var(--accent-orange);
+    }
+
+    .feature-card-title {
+      font-family: var(--font-heading);
+      font-size: 15.5px;
+      font-weight: 800;
+      color: var(--text-heading);
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+
+    .feature-card-desc {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .feature-card-btn {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border: 1px solid var(--border-medium);
+      background: var(--bg-subtle);
+      color: var(--text-heading);
+      transition: all 0.2s;
+    }
+
+    .feature-card.selected-card .feature-card-btn {
+      background: var(--accent-orange);
+      border-color: var(--accent-orange);
+      color: #fff;
+    }
+
+    /* Workspace Tab Navigation */
+    .tabs-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 8px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 6px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-heading);
+      background: var(--bg-subtle);
+    }
+
+    .tab-btn.active {
+      background: var(--accent-orange-light);
+      border-color: rgba(234, 101, 15, 0.3);
+      color: var(--accent-orange);
+      font-weight: 700;
+    }
+
+    /* Workspace Container */
+    .workspace-section {
+      display: none;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 26px 28px;
+      margin-bottom: 40px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .workspace-section.active {
+      display: block;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section-header-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .section-title {
+      font-family: var(--font-heading);
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--text-heading);
+      margin-bottom: 3px;
+    }
+
+    .section-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Form Fields Grid */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 860px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .field-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .field-input {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border-medium);
+      border-radius: 8px;
+      padding: 9px 12px;
+      color: var(--text-heading);
+      font-family: var(--font-body);
+      font-size: 13.5px;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .field-input:focus {
+      border-color: var(--accent-orange);
+      box-shadow: 0 0 0 3px rgba(234, 101, 15, 0.1);
+    }
+
+    .quick-pills {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+
+    .quick-pill {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-body);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .quick-pill:hover,
+    .quick-pill.active {
+      border-color: var(--accent-orange);
+      color: var(--accent-orange);
+      background: var(--accent-orange-light);
+      font-weight: 700;
+    }
+
+    .vehicle-selector-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .vehicle-card {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 9px 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .vehicle-card.selected {
+      border-color: var(--accent-orange);
+      background: var(--accent-orange-light);
+    }
+
+    .vehicle-card-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-heading);
+    }
+
+    .vehicle-card-sub {
+      font-size: 10.5px;
+      color: var(--text-muted);
+    }
+
+    .action-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-subtle);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    /* Result Card Styling */
+    .result-container {
+      display: none;
+      margin-top: 24px;
+      background: #ffffff;
+      border: 1px solid var(--border-medium);
+      border-radius: 10px;
+      padding: 22px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .result-top-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .result-title {
+      font-family: var(--font-heading);
+      font-size: 21px;
+      font-weight: 800;
+      color: var(--text-heading);
+      margin-bottom: 2px;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .metric-card {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 12px 14px;
+    }
+
+    .metric-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 3px;
+    }
+
+    .metric-value {
+      font-family: var(--font-heading);
+      font-size: 21px;
+      font-weight: 800;
+      color: var(--text-heading);
+    }
+
+    .metric-value.orange {
+      color: var(--accent-orange);
+    }
+
+    .metric-value.green {
+      color: var(--accent-green);
+    }
+
+    .metric-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .subheading {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-heading);
+      margin: 16px 0 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-bottom: 16px;
+    }
+
+    .bullet-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-body);
+      line-height: 1.5;
+    }
+
+    .bullet-icon {
+      color: var(--accent-orange);
+      font-size: 13px;
+      line-height: 1.4;
+      flex-shrink: 0;
+      font-weight: 700;
+    }
+
+    .analysis-text-box {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 12px 15px;
+      font-size: 13px;
+      color: var(--text-body);
+      line-height: 1.55;
+      margin-bottom: 18px;
+    }
+
+    /* Comparison & Alternatives Table */
+    .data-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      margin-bottom: 18px;
+      background: #fff;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: left;
+    }
+
+    .data-table th {
+      background: var(--bg-subtle);
+      padding: 9px 12px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .data-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-body);
+    }
+
+    .data-table tr.highlight td {
+      background: var(--accent-orange-light);
+      font-weight: 600;
+    }
+
+    .compare-scenario-box {
+      display: none;
+      background: var(--bg-subtle);
+      border: 1px dashed var(--border-medium);
+      border-radius: 8px;
+      padding: 14px;
+      margin-top: 12px;
+    }
+
+    .compare-scenario-box.show {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="research-wrapper">
+    <!-- Header matching Site Planner -->
+    <header class="site-header">
+      <div class="brand-section">
+        <div class="brand-badge-row">
+          <div class="brand-logo-text">EVISION<span>.</span></div>
+          <span class="mono-tag orange">INFRASTRUCTURE INTELLIGENCE</span>
+          <span class="mono-tag">RESEARCH WITH AI</span>
+        </div>
+        <div class="brand-subtext">EV CHARGING INVESTMENT RESEARCH</div>
+      </div>
+
+      <div class="header-actions">
+        <a href="site-planner/3dvision.html" target="_blank" rel="noopener noreferrer" class="btn btn-secondary"
+          style="border-color:var(--accent-orange);color:var(--accent-orange);font-weight:700;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path
+              d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+          </svg>
+          3D Vision Studio ↗
+        </a>
+        <a href="site-planner/dashboard.html" class="btn btn-secondary" id="btnBackToPlanner">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+          </svg>
+          Back to Site Planner
+        </a>
+        <a href="landing.html" class="btn btn-secondary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+          </svg>
+          Landing Page
+        </a>
+      </div>
+    </header>
+
+    <!-- Active Site Project Context Banner -->
+    <div class="active-project-banner" id="activeProjectBanner">
+      <div class="active-project-top">
+        <div class="active-project-badge-group">
+          <span class="mono-tag orange">● ACTIVE SITE PROJECT</span>
+          <span class="mono-tag" id="projIdBadge">EV-2026-PUNE-01</span>
+          <span style="font-size:12px;color:var(--text-muted);" id="projSyncStatus">Synchronized with Site Planner</span>
+        </div>
+        <a href="site-planner/dashboard.html" class="btn btn-secondary btn-sm" style="font-size:12px;padding:5px 10px;">
+          <span class="material-symbols-outlined" style="font-size:14px">edit</span>
+          Modify in Site Planner
+        </a>
+      </div>
+      <div class="active-project-grid">
+        <div>
+          <div class="proj-label">TARGET LOCATION</div>
+          <div class="proj-value" id="projLocText">Pune — MH12 Corridor</div>
+        </div>
+        <div>
+          <div class="proj-label">VEHICLE MIX</div>
+          <div class="proj-value" id="projVehText">Mixed (2W + 4W)</div>
+        </div>
+        <div>
+          <div class="proj-label">PLANNED HARDWARE</div>
+          <div class="proj-value" id="projHwText">2x DC CCS2 Fast (50 kW)</div>
+        </div>
+        <div>
+          <div class="proj-label">BUDGET ENVELOPE</div>
+          <div class="proj-value" id="projBudgetText">₹ 15,00,000</div>
+        </div>
+        <div>
+          <div class="proj-label">SITE PLANNER SCORE</div>
+          <div class="proj-value orange" id="projScoreText">84.5 / 100</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-label">RESEARCH WITH AI</div>
+      <h1 class="hero-heading">MAKE A SMARTER CHARGING INVESTMENT</h1>
+      <p class="hero-subtext">
+        Analyze your planned site, test financial sensitivity scenarios, and use AI reasoning grounded in real project data.
+      </p>
+    </section>
+
+    <!-- Four User-Facing Feature Cards -->
+    <section class="feature-cards-grid">
+      <!-- Card 1: Why This Location? -->
+      <div class="feature-card selected-card" id="card-1" onclick="switchTab('tab-why-loc');">
+        <div>
+          <div class="feature-card-header">
+            <div class="feature-icon-box">
+              <span class="material-symbols-outlined">location_on</span>
+            </div>
+            <span class="feature-num">01</span>
+          </div>
+          <h2 class="feature-card-title">WHY THIS LOCATION?</h2>
+          <p class="feature-card-desc">
+            Understand why EVision considers this location a strong opportunity for a new charging station.
+          </p>
+        </div>
+        <button type="button" class="feature-card-btn">
+          Analyze Location
+        </button>
+      </div>
+
+      <!-- Card 2: Location Insights -->
+      <div class="feature-card" id="card-2" onclick="switchTab('tab-insights');">
+        <div>
+          <div class="feature-card-header">
+            <div class="feature-icon-box">
+              <span class="material-symbols-outlined">insights</span>
+            </div>
+            <span class="feature-num">02</span>
+          </div>
+          <h2 class="feature-card-title">LOCATION INSIGHTS</h2>
+          <p class="feature-card-desc">
+            Explore EV demand, existing charging coverage, competition, and infrastructure gaps around your selected location.
+          </p>
+        </div>
+        <button type="button" class="feature-card-btn">
+          Explore Insights
+        </button>
+      </div>
+
+      <!-- Card 3: AI Simulator -->
+      <div class="feature-card" id="card-3" onclick="switchTab('tab-simulator');">
+        <div>
+          <div class="feature-card-header">
+            <div class="feature-icon-box">
+              <span class="material-symbols-outlined">calculate</span>
+            </div>
+            <span class="feature-num">03</span>
+          </div>
+          <h2 class="feature-card-title">AI SIMULATOR</h2>
+          <p class="feature-card-desc">
+            Test different station scenarios and estimate revenue, ROI, payback, and charging demand before you invest.
+          </p>
+        </div>
+        <button type="button" class="feature-card-btn">
+          Run Simulation
+        </button>
+      </div>
+
+      <!-- Card 4: Configuration Optimizer -->
+      <div class="feature-card" id="card-4" onclick="switchTab('tab-optimizer');">
+        <div>
+          <div class="feature-card-header">
+            <div class="feature-icon-box">
+              <span class="material-symbols-outlined">tune</span>
+            </div>
+            <span class="feature-num">04</span>
+          </div>
+          <h2 class="feature-card-title">CONFIGURATION OPTIMIZER</h2>
+          <p class="feature-card-desc">
+            Find the charger type and number of charging points that best fit your budget and investment goal.
+          </p>
+        </div>
+        <button type="button" class="feature-card-btn">
+          Optimize Setup
+        </button>
+      </div>
+    </section>
+
+    <!-- Workspace Tabs -->
+    <div class="tabs-bar">
+      <button type="button" class="tab-btn active" id="tabBtn1" onclick="switchTab('tab-why-loc');">
+        <span class="material-symbols-outlined" style="font-size:16px">location_on</span>
+        01 — Why This Location?
+      </button>
+      <button type="button" class="tab-btn" id="tabBtn2" onclick="switchTab('tab-insights');">
+        <span class="material-symbols-outlined" style="font-size:16px">insights</span>
+        02 — Location Insights
+      </button>
+      <button type="button" class="tab-btn" id="tabBtn3" onclick="switchTab('tab-simulator');">
+        <span class="material-symbols-outlined" style="font-size:16px">calculate</span>
+        03 — AI Simulator
+      </button>
+      <button type="button" class="tab-btn" id="tabBtn4" onclick="switchTab('tab-optimizer');">
+        <span class="material-symbols-outlined" style="font-size:16px">tune</span>
+        04 — Configuration Optimizer
+      </button>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- WORKSPACE 1: WHY THIS LOCATION? -->
+    <!-- ========================================================================= -->
+    <div class="workspace-section active" id="tab-why-loc">
+      <div class="section-header-row">
+        <div>
+          <h3 class="section-title">01 — Location Feasibility Analysis</h3>
+          <p class="section-desc">Assess site potential, commercial hotspot strength, and key location drivers.</p>
+        </div>
+        <span class="mono-tag orange">AI LOCATION ANALYSIS</span>
+      </div>
+
+      <div class="form-grid">
+        <div class="field-group">
+          <label class="field-label">Target Location / City</label>
+          <input type="text" class="field-input" id="locCity" value="Pune" />
+          <div class="quick-pills">
+            <button type="button" class="quick-pill active" onclick="setCityLoc('Pune')">Pune</button>
+            <button type="button" class="quick-pill" onclick="setCityLoc('Bengaluru')">Bengaluru</button>
+            <button type="button" class="quick-pill" onclick="setCityLoc('Mumbai')">Mumbai</button>
+            <button type="button" class="quick-pill" onclick="setCityLoc('Delhi NCR')">Delhi NCR</button>
+            <button type="button" class="quick-pill" onclick="setCityLoc('Chennai')">Chennai</button>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Target Vehicle Segment</label>
+          <div class="vehicle-selector-row">
+            <div class="vehicle-card" data-val="Two-Wheeler" onclick="selectVehLoc('Two-Wheeler');">
+              <span class="vehicle-card-title">🛵 2-Wheeler</span>
+              <span class="vehicle-card-sub">Scooters & Bikes</span>
+            </div>
+            <div class="vehicle-card" data-val="Four-Wheeler" onclick="selectVehLoc('Four-Wheeler');">
+              <span class="vehicle-card-title">🚗 4-Wheeler</span>
+              <span class="vehicle-card-sub">Cars & Fleets</span>
+            </div>
+            <div class="vehicle-card selected" data-val="Both" onclick="selectVehLoc('Both');">
+              <span class="vehicle-card-title">⚡ Mixed</span>
+              <span class="vehicle-card-sub">All Vehicles</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-bar">
+        <div style="font-size:12.5px;color:var(--text-muted);">
+          Evaluates regional vehicle demand and existing charging supply to explain the site opportunity.
+        </div>
+        <button type="button" class="btn btn-primary" id="btnAnalyzeLoc" onclick="runLocationAnalysis();">
+          <span class="material-symbols-outlined" style="font-size:16px">location_on</span>
+          <span id="btnAnalyzeLocText">Analyze Location</span>
+        </button>
+      </div>
+
+      <!-- Result 1 -->
+      <div class="result-container" id="locResultBox" style="display:block;">
+        <div class="result-top-row">
+          <div>
+            <div style="font-family:var(--font-mono);font-size:10.5px;color:var(--accent-orange);margin-bottom:2px;text-transform:uppercase;">
+              RECOMMENDED LOCATION
+            </div>
+            <h2 class="result-title" id="locResName">Pune — MH12 Corridor, Maharashtra</h2>
+            <div style="font-family:var(--font-mono);font-size:11.5px;color:var(--text-muted);" id="locResCoords">LAT: 18.5204°, LNG: 73.8567°</div>
+          </div>
+          <div>
+            <span class="mono-tag green" id="locResRating">HIGH OPPORTUNITY</span>
+          </div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-label">EVision Hotspot Score</div>
+            <div class="metric-value orange" id="locResScore">84.5 <span style="font-size:13px;color:var(--text-muted);">/ 100</span></div>
+            <div class="metric-sub">Commercial viability score</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Recommendation Strength</div>
+            <div class="metric-value green" id="locResStrength" style="font-size:18px;">Highly Recommended</div>
+            <div class="metric-sub">Multi-factor assessment</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Existing Charging Coverage</div>
+            <div class="metric-value" id="locResStations">30 Stations</div>
+            <div class="metric-sub" id="locResStationBreakdown">18 Fast DC • 12 AC</div>
+          </div>
+        </div>
+
+        <div class="subheading">
+          <span class="material-symbols-outlined" style="font-size:17px;color:var(--accent-orange)">check_circle</span>
+          Why this location?
+        </div>
+        <ul class="bullet-list" id="locResWhyList">
+          <li class="bullet-item"><span class="bullet-icon">✓</span><span>High EV adoption rate with over 131,273 registered vehicles in the regional catchment.</span></li>
+          <li class="bullet-item"><span class="bullet-icon">✓</span><span>Direct primary road access with 24,000+ daily passing vehicular traffic.</span></li>
+          <li class="bullet-item"><span class="bullet-icon">✓</span><span>11kV state grid substation located within 0.9 km with 650 kVA available headroom.</span></li>
+          <li class="bullet-item"><span class="bullet-icon">✓</span><span>Fast 1.9-year modeled capital recovery period under conservative utilization.</span></li>
+        </ul>
+
+        <div class="subheading">
+          <span class="material-symbols-outlined" style="font-size:17px;color:var(--accent-orange)">stacked_bar_chart</span>
+          Infrastructure Gap
+        </div>
+        <div class="analysis-text-box" id="locResGap">
+          Despite 30 operational stations across the metro area, central commercial corridors experience heavy evening queueing exceeding 35 minutes. Fast 50kW+ DC charging capacity is urgently required.
+        </div>
+
+        <div class="subheading">
+          <span class="material-symbols-outlined" style="font-size:17px;color:var(--accent-orange)">psychology</span>
+          AI Location Analysis
+        </div>
+        <div class="analysis-text-box" id="locResAnalysis">
+          Pune represents an outstanding commercial opportunity for EV charging deployment. Strong vehicle penetration combined with ready 11kV grid connectivity delivers strong capital yield with low civil risk.
+        </div>
+
+        <div class="subheading">
+          <span class="material-symbols-outlined" style="font-size:17px;color:var(--text-muted)">info</span>
+          Important Considerations
+        </div>
+        <ul class="bullet-list" id="locResConsiderations">
+          <li class="bullet-item"><span class="material-symbols-outlined" style="font-size:15px;color:var(--text-muted);flex-shrink:0;">info</span><span>Allow 3-4 weeks for DISCOM transformer sanction and net-metering setup.</span></li>
+          <li class="bullet-item"><span class="material-symbols-outlined" style="font-size:15px;color:var(--text-muted);flex-shrink:0;">info</span><span>Co-location with existing food retail or fuel pumps increases daytime dwell revenue.</span></li>
+        </ul>
+
+        <div class="action-bar" style="margin-top:16px;">
+          <div style="font-size:12.5px;color:var(--text-muted);">
+            Location evaluation grounded in regional vehicle mobility demand and available charging infrastructure.
+          </div>
+          <a href="#" class="btn btn-secondary" id="btnViewMapLoc" onclick="openMapView(event)">
+            <span class="material-symbols-outlined" style="font-size:16px">map</span>
+            View on Map
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- WORKSPACE 2: LOCATION INSIGHTS -->
+    <!-- ========================================================================= -->
+    <div class="workspace-section" id="tab-insights">
+      <div class="section-header-row">
+        <div>
+          <h3 class="section-title">02 — Location & Market Insights</h3>
+          <p class="section-desc">Explore regional vehicle demand, charging competition, and micro-market opportunities.</p>
+        </div>
+        <span class="mono-tag orange">MARKET INTELLIGENCE</span>
+      </div>
+
+      <div class="form-grid">
+        <div class="field-group">
+          <label class="field-label">Target Location / City</label>
+          <input type="text" class="field-input" id="insCity" value="Pune" />
+          <div class="quick-pills">
+            <button type="button" class="quick-pill active" onclick="setCityIns('Pune')">Pune</button>
+            <button type="button" class="quick-pill" onclick="setCityIns('Bengaluru')">Bengaluru</button>
+            <button type="button" class="quick-pill" onclick="setCityIns('Mumbai')">Mumbai</button>
+            <button type="button" class="quick-pill" onclick="setCityIns('Delhi NCR')">Delhi NCR</button>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Vehicle Mobility Focus</label>
+          <select class="field-input" id="insVehType">
+            <option value="Both" selected>All Vehicle Segments (2W + 4W)</option>
+            <option value="Four-Wheeler">Four-Wheelers (Cars & Taxis)</option>
+            <option value="Two-Wheeler">Two-Wheelers (Bikes & Scooters)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="action-bar">
+        <div style="font-size:12.5px;color:var(--text-muted);">
+          Analyzes regional vehicle volumes, EV share, and operational charging points in the area.
+        </div>
+        <button type="button" class="btn btn-primary" id="btnRunInsights" onclick="runLocationInsights();">
+          <span class="material-symbols-outlined" style="font-size:16px">insights</span>
+          <span id="btnRunInsightsText">Explore Insights</span>
+        </button>
+      </div>
+
+      <!-- Result 2 -->
+      <div class="result-container" id="insResultBox" style="display:block;">
+        <div class="result-top-row">
+          <div>
+            <div style="font-family:var(--font-mono);font-size:10.5px;color:var(--accent-orange);margin-bottom:2px;text-transform:uppercase;">
+              LOCATION INSIGHTS
+            </div>
+            <h2 class="result-title" id="insResName">Pune — MH12 Market Overview</h2>
+          </div>
+          <div>
+            <span class="mono-tag green" id="insResSuitability">HIGH SUITABILITY</span>
+          </div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-label">EVision Hotspot Score</div>
+            <div class="metric-value orange" id="insResScore">84.5 / 100</div>
+            <div class="metric-sub">Commercial potential</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Vehicle Demand</div>
+            <div class="metric-value" id="insResTargetVeh">131,273</div>
+            <div class="metric-sub" id="insResTotalVeh">Total: 1,284,500 vehicles</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Local EV Adoption</div>
+            <div class="metric-value green" id="insResEvShare">10.22 %</div>
+            <div class="metric-sub">EV penetration rate</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Existing Charging Coverage</div>
+            <div class="metric-value" id="insResCoverage">30 Stations</div>
+            <div class="metric-sub" id="insResFastCount">18 Fast DC • 12 AC</div>
+          </div>
+        </div>
+
+        <div class="subheading">
+          <span class="material-symbols-outlined" style="font-size:17px;color:var(--accent-orange)">store</span>
+          Competition & Charging Supply
+        </div>
+        <div class="analysis-text-box" id="insResComp">
+          30 charging stations operate in the broader district, primarily distributed between Tata Power, Jio-BP, and public municipal charging networks.
+        </div>
+
+        <div class="subheading">
+          <span class="material-symbols-outlined" style="font-size:17px;color:var(--accent-orange)">stacked_bar_chart</span>
+          Infrastructure Gap Assessment
+        </div>
+        <div class="analysis-text-box" id="insResGap">
+          High ratio of electric four-wheelers and delivery fleets with under-served corridor fast charging. Additional 50kW-120kW stations will capture immediate overflow traffic.
+        </div>
+
+        <div class="subheading">
+          <span class="material-symbols-outlined" style="font-size:17px;color:var(--accent-green)">psychology</span>
+          Strategic Location Summary
+        </div>
+        <div class="analysis-text-box" id="insResSummary">
+          High suitability for fast-charging deployment based on consistent traffic pass-by, high local EV concentration, and available substation capacity.
+        </div>
+
+        <div class="subheading">
+          <span class="material-symbols-outlined" style="font-size:17px;color:var(--text-muted)">table_chart</span>
+          Micro-Market Candidate Zones
+        </div>
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Candidate Zone</th>
+                <th>Hotspot Score</th>
+                <th>Target Vehicles</th>
+                <th>Total Vehicles</th>
+                <th>EV Share</th>
+              </tr>
+            </thead>
+            <tbody id="insResTableBody">
+              <tr class="highlight">
+                <td><span class="mono-tag orange">#01</span></td>
+                <td><strong>Pune — Primary Arterial Ingress</strong><br><span style="font-size:11px;color:var(--text-muted);">MH12 Urban Corridor</span></td>
+                <td><strong>84.5</strong></td>
+                <td>131,273</td>
+                <td>1,284,500</td>
+                <td>10.22%</td>
+              </tr>
+              <tr>
+                <td><span class="mono-tag">#02</span></td>
+                <td><strong>Pune — Secondary Bypass Forecourt</strong><br><span style="font-size:11px;color:var(--text-muted);">Transit Bypass</span></td>
+                <td><strong>79.2</strong></td>
+                <td>98,400</td>
+                <td>1,050,000</td>
+                <td>9.37%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- WORKSPACE 3: AI SIMULATOR -->
+    <!-- ========================================================================= -->
+    <div class="workspace-section" id="tab-simulator">
+      <div class="section-header-row">
+        <div>
+          <h3 class="section-title">03 — Station Investment & Financial Simulator</h3>
+          <p class="section-desc">Test different station scenarios and estimate revenue, ROI, payback, and charging demand before you invest.</p>
+        </div>
+        <span class="mono-tag green">FINANCIAL ENGINE</span>
+      </div>
+
+      <div class="form-grid">
+        <div class="field-group">
+          <label class="field-label">Station Location / City</label>
+          <input type="text" class="field-input" id="simCity" value="Pune" />
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Vehicle Mobility Mix</label>
+          <select class="field-input" id="simVehMix">
+            <option value="Both" selected>Mixed Fleet (2W + 4W)</option>
+            <option value="Four-Wheeler">Four-Wheelers (Cars & Fleets)</option>
+            <option value="Two-Wheeler">Two-Wheelers (Bikes & Scooters)</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">
+            Investment Budget (INR)
+            <span id="simBudgetDisplay" style="color:var(--accent-orange);">₹ 15,00,000</span>
+          </label>
+          <input type="range" class="field-input" id="simBudgetSlider" min="300000" max="6000000" step="100000" value="1500000"
+            oninput="document.getElementById('simBudgetDisplay').textContent = '₹ ' + parseInt(this.value).toLocaleString();" />
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Charger Hardware Type</label>
+          <select class="field-input" id="simChargerSelect">
+            <option value="DC CCS2 Fast (50 kW)" selected>DC CCS2 Fast (50 kW)</option>
+            <option value="DC Fast Charger (15 kW)">DC Fast Charger (15 kW)</option>
+            <option value="DC CCS2 Ultra-Fast (120 kW)">DC CCS2 Ultra-Fast (120 kW)</option>
+            <option value="AC Type 2 (22 kW)">AC Type 2 (22 kW)</option>
+            <option value="AC Slow Charger (3.3 kW)">AC Slow Charger (3.3 kW)</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Number of Charging Points / Guns</label>
+          <select class="field-input" id="simGunsSelect">
+            <option value="1">1 Charging Gun</option>
+            <option value="2" selected>2 Charging Guns</option>
+            <option value="4">4 Charging Guns</option>
+            <option value="6">6 Charging Guns</option>
+          </select>
+        </div>
+
+        <div class="field-group" style="justify-content:center;">
+          <label class="field-label">What-If Comparison</label>
+          <button type="button" class="btn btn-secondary" id="btnToggleComp" onclick="toggleComparison();" style="width:100%;justify-content:center;">
+            <span class="material-symbols-outlined" style="font-size:16px">compare_arrows</span>
+            <span id="btnToggleCompText">+ Compare with Scenario B</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Scenario B Box -->
+      <div class="compare-scenario-box" id="scenarioBBox">
+        <div style="font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--accent-orange);margin-bottom:10px;text-transform:uppercase;">
+          ⚡ SCENARIO B (COMPARATIVE SETUP)
+        </div>
+        <div class="form-grid" style="margin-bottom:0;">
+          <div class="field-group">
+            <label class="field-label">Scenario B Budget</label>
+            <input type="number" class="field-input" id="simBudgetBInput" value="2800000" step="100000" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Scenario B Charger</label>
+            <select class="field-input" id="simChargerBSelect">
+              <option value="DC CCS2 Ultra-Fast (120 kW)" selected>DC CCS2 Ultra-Fast (120 kW)</option>
+              <option value="DC CCS2 Fast (50 kW)">DC CCS2 Fast (50 kW)</option>
+              <option value="AC Type 2 (22 kW)">AC Type 2 (22 kW)</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Scenario B Charging Guns</label>
+            <select class="field-input" id="simGunsBSelect">
+              <option value="2">2 Guns</option>
+              <option value="4" selected>4 Guns</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-bar">
+        <div style="font-size:12.5px;color:var(--text-muted);">
+          Calculates real financial metrics based on local demand and power tariffs before AI analysis.
+        </div>
+        <button type="button" class="btn btn-primary" id="btnRunSimulator" onclick="runSimulatorAction();">
+          <span class="material-symbols-outlined" style="font-size:16px">calculate</span>
+          <span id="btnRunSimulatorText">Run Simulation</span>
+        </button>
+      </div>
+
+      <!-- Result 3 -->
+      <div class="result-container" id="simResultBox" style="display:block;">
+        <div class="result-top-row">
+          <div>
+            <div style="font-family:var(--font-mono);font-size:10.5px;color:var(--accent-orange);margin-bottom:2px;text-transform:uppercase;">
+              SIMULATION RESULTS
+            </div>
+            <h2 class="result-title" id="simResHeading">2x DC CCS2 Fast (50 kW) (Pune)</h2>
+          </div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-label">Estimated Monthly Revenue</div>
+            <div class="metric-value green" id="simResRev">₹ 1,42,500</div>
+            <div class="metric-sub" id="simResEnergyText">9,500 kWh/mo • 380 sessions</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Estimated Operating Cost</div>
+            <div class="metric-value" id="simResCost">₹ 76,041</div>
+            <div class="metric-sub">Power & maintenance</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Estimated Monthly Profit</div>
+            <div class="metric-value orange" id="simResProfit">₹ 66,459</div>
+            <div class="metric-sub" id="simResAnnualProfitText">Annual: ₹ 7,97,508</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Estimated ROI & Payback</div>
+            <div class="metric-value green" id="simResRoiText">53.2 %</div>
+            <div class="metric-sub" id="simResPaybackText">Payback: 1.88 yrs (22% Util)</div>
+          </div>
+        </div>
+
+        <!-- Comparison Table -->
+        <div id="simCompWrap" style="display:none;margin-bottom:20px;">
+          <div class="subheading">
+            <span class="material-symbols-outlined" style="font-size:17px;color:var(--accent-orange)">compare_arrows</span>
+            Scenario Comparison Matrix
+          </div>
+          <div class="data-table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Financial Metric</th>
+                  <th>Scenario A (Current)</th>
+                  <th>Scenario B (Alternative)</th>
+                  <th>Variance</th>
+                </tr>
+              </thead>
+              <tbody id="simCompTableBody"></tbody>
+            </table>
+          </div>
+          <div class="analysis-text-box" id="simCompVerdict" style="border-color:rgba(5,150,105,0.3);background:var(--accent-green-light);"></div>
+        </div>
+
+        <div class="subheading">
+          <span class="material-symbols-outlined" style="font-size:17px;color:var(--accent-orange)">psychology</span>
+          AI Simulation Analysis
+        </div>
+        <div class="analysis-text-box" id="simResAiOverview">
+          Based on the selected configuration (2x DC CCS2 Fast 50 kW with budget of ₹15,00,000), this setup delivers an annual ROI of 53.2% and capital recovery in 1.88 years under baseline 22% daily utilization.
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+          <div style="background:var(--bg-subtle);padding:14px;border-radius:8px;border:1px solid var(--border-subtle);">
+            <strong style="color:var(--accent-green);font-size:13px;display:block;margin-bottom:8px;">✓ Financial Strengths</strong>
+            <ul class="bullet-list" id="simResStrengthsList" style="margin-bottom:0;">
+              <li class="bullet-item"><span class="bullet-icon">✓</span><span>Generates ₹66,459 monthly net profit with conservative operating cost structure.</span></li>
+              <li class="bullet-item"><span class="bullet-icon">✓</span><span>Rapid capital recovery within 22.5 months.</span></li>
+            </ul>
+          </div>
+          <div style="background:var(--bg-subtle);padding:14px;border-radius:8px;border:1px solid var(--border-subtle);">
+            <strong style="color:var(--accent-orange);font-size:13px;display:block;margin-bottom:8px;">⚠ Cost Drivers & Limitations</strong>
+            <ul class="bullet-list" id="simResWeaknessesList" style="margin-bottom:0;">
+              <li class="bullet-item"><span class="material-symbols-outlined" style="font-size:15px;color:var(--accent-orange);flex-shrink:0;">error_outline</span><span>Commercial power tariff (₹7.5/kWh) represents the largest monthly variable OpEx.</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="subheading">
+          <span class="material-symbols-outlined" style="font-size:17px;color:var(--text-muted)">warning</span>
+          Operational & Grid Considerations
+        </div>
+        <ul class="bullet-list" id="simResRisksList">
+          <li class="bullet-item"><span class="material-symbols-outlined" style="font-size:15px;color:var(--text-muted);flex-shrink:0;">warning</span><span>DISCOM HT metering lead times can range from 3-5 weeks during peak season.</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- WORKSPACE 4: CONFIGURATION OPTIMIZER -->
+    <!-- ========================================================================= -->
+    <div class="workspace-section" id="tab-optimizer">
+      <div class="section-header-row">
+        <div>
+          <h3 class="section-title">04 — Hardware & Setup Optimizer</h3>
+          <p class="section-desc">Find the charger type and number of charging points that best fit your budget and investment goal.</p>
+        </div>
+        <span class="mono-tag orange">OPTIMIZATION ENGINE</span>
+      </div>
+
+      <div class="form-grid">
+        <div class="field-group">
+          <label class="field-label">Target Location / City</label>
+          <input type="text" class="field-input" id="optCity" value="Pune" />
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Target Vehicle Segment</label>
+          <select class="field-input" id="optVehMix">
+            <option value="Both" selected>All Vehicles (2W + 4W Mixed)</option>
+            <option value="Four-Wheeler">Four-Wheeler</option>
+            <option value="Two-Wheeler">Two-Wheeler</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">
+            Available Investment Budget
+            <span id="optBudgetDisplay" style="color:var(--accent-orange);">₹ 20,00,000</span>
+          </label>
+          <input type="range" class="field-input" id="optBudgetSlider" min="500000" max="8000000" step="250000" value="2000000"
+            oninput="document.getElementById('optBudgetDisplay').textContent = '₹ ' + parseInt(this.value).toLocaleString();" />
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Primary Investment Goal</label>
+          <select class="field-input" id="optGoalSelect">
+            <option value="max_profit" selected>💰 Maximum Monthly Profit</option>
+            <option value="max_roi">📈 Maximum Annual ROI (%)</option>
+            <option value="fastest_payback">⚡ Fastest Capital Payback</option>
+            <option value="lowest_investment">🏷️ Lowest Initial CapEx</option>
+            <option value="max_capacity">🔌 Maximum Charging Throughput (kW)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="action-bar">
+        <div style="font-size:12.5px;color:var(--text-muted);">
+          Calculates multiple valid charger configurations and recommends the setup that best achieves your target goal.
+        </div>
+        <button type="button" class="btn btn-primary" id="btnRunOptimizer" onclick="runOptimizerAction();">
+          <span class="material-symbols-outlined" style="font-size:16px">tune</span>
+          <span id="btnRunOptimizerText">Optimize Setup</span>
+        </button>
+      </div>
+
+      <!-- Result 4 -->
+      <div class="result-container" id="optResultBox" style="display:block;">
+        <div class="result-top-row">
+          <div>
+            <div style="font-family:var(--font-mono);font-size:10.5px;color:var(--accent-orange);margin-bottom:2px;text-transform:uppercase;">
+              RECOMMENDED CONFIGURATION
+            </div>
+            <h2 class="result-title" id="optResTitle">Dual Fast DC Hub (50 kW)</h2>
+            <div style="font-size:12.5px;color:var(--text-muted);" id="optResSubtitle">2 Guns • DC CCS2 Fast (50 kW) in Pune</div>
+          </div>
+          <div>
+            <span class="mono-tag green" id="optResGoalBadge">OPTIMIZED FOR MAXIMUM PROFIT</span>
+          </div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-label">Estimated Investment</div>
+            <div class="metric-value orange" id="optResCapex">₹ 15,00,000</div>
+            <div class="metric-sub" id="optResGuns">2 Guns (DC Fast)</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Total Power Capacity</div>
+            <div class="metric-value" id="optResPowerText">100 kW</div>
+            <div class="metric-sub">Peak charging power</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Monthly Net Profit</div>
+            <div class="metric-value green" id="optResProfitText">₹ 66,459</div>
+            <div class="metric-sub" id="optResRevText">Gross: ₹ 1,42,500</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Annual ROI & Payback</div>
+            <div class="metric-value green" id="optResRoiText">53.2 %</div>
+            <div class="metric-sub" id="optResPaybackText">Payback: 1.9 yrs</div>
+          </div>
+        </div>
+
+        <div class="subheading">
+          <span class="material-symbols-outlined" style="font-size:17px;color:var(--accent-orange)">psychology</span>
+          Why this configuration?
+        </div>
+        <div class="analysis-text-box" id="optResWhyText">
+          The Dual Fast DC Hub (50 kW) is recommended because it maximizes profit yield within your ₹20,00,000 budget envelope while maintaining short 45-minute vehicle turnaround times.
+        </div>
+
+        <div class="subheading">
+          <span class="material-symbols-outlined" style="font-size:17px;color:var(--accent-green)">check_circle</span>
+          Key Advantages
+        </div>
+        <ul class="bullet-list" id="optResAdvList">
+          <li class="bullet-item"><span class="bullet-icon">✓</span><span>Generates ₹66,459/month net profit with rapid 1.9-year capital payback.</span></li>
+          <li class="bullet-item"><span class="bullet-icon">✓</span><span>2 charging guns deliver 100 kW peak capacity matching local grid headroom.</span></li>
+        </ul>
+
+        <div class="subheading" style="margin-top:24px;">
+          <span class="material-symbols-outlined" style="font-size:17px;color:var(--text-muted)">alt_route</span>
+          Alternative Configurations Evaluated
+        </div>
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Option</th>
+                <th>Configuration</th>
+                <th>Investment</th>
+                <th>Capacity</th>
+                <th>Monthly Profit</th>
+                <th>Annual ROI</th>
+                <th>Payback</th>
+              </tr>
+            </thead>
+            <tbody id="optResAltsBody">
+              <tr>
+                <td><span class="mono-tag">Alt 01</span></td>
+                <td><strong>Smart Destination AC Hub</strong><br><span style="font-size:11px;color:var(--text-muted);">4x AC Type 2 (22 kW)</span></td>
+                <td>₹ 8,00,000</td>
+                <td>88 kW</td>
+                <td><strong style="color:var(--accent-orange);">₹ 31,500</strong></td>
+                <td>47.2%</td>
+                <td>2.1 yrs</td>
+              </tr>
+              <tr>
+                <td><span class="mono-tag">Alt 02</span></td>
+                <td><strong>High-Power DC Dispenser</strong><br><span style="font-size:11px;color:var(--text-muted);">1x DC CCS2 (120 kW)</span></td>
+                <td>₹ 25,00,000</td>
+                <td>120 kW</td>
+                <td><strong style="color:var(--accent-orange);">₹ 1,33,117</strong></td>
+                <td>63.9%</td>
+                <td>1.6 yrs</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const API_BASE = (window.location.protocol === 'file:' || (!window.location.port.includes('8000') && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')))
+      ? 'http://127.0.0.1:8000'
+      : '';
+
+    let currentLocVehicle = 'Both';
+    let isComparingSim = false;
+    let cachedLocationCoords = null;
+    let cachedLocationName = '';
+    let activeProjectState = null;
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.feature-card').forEach(card => card.classList.remove('selected-card'));
+      document.querySelectorAll('.workspace-section').forEach(ws => ws.classList.remove('active'));
+
+      const ws = document.getElementById(tabId);
+      if (ws) ws.classList.add('active');
+
+      if (tabId === 'tab-why-loc') {
+        document.getElementById('tabBtn1').classList.add('active');
+        document.getElementById('card-1').classList.add('selected-card');
+      } else if (tabId === 'tab-insights') {
+        document.getElementById('tabBtn2').classList.add('active');
+        document.getElementById('card-2').classList.add('selected-card');
+      } else if (tabId === 'tab-simulator') {
+        document.getElementById('tabBtn3').classList.add('active');
+        document.getElementById('card-3').classList.add('selected-card');
+      } else if (tabId === 'tab-optimizer') {
+        document.getElementById('tabBtn4').classList.add('active');
+        document.getElementById('card-4').classList.add('selected-card');
+      }
+
+      if (ws) ws.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    /* -------------------------------------------------------------
+     * SHARED PROJECT STATE LOADER
+     * ------------------------------------------------------------- */
+    async function loadActiveProject() {
+      // 1. Try URL param ?project_id=...
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlProjId = urlParams.get('project_id');
+
+      let project = null;
+
+      if (urlProjId) {
+        try {
+          const res = await fetch(`${API_BASE}/api/project/${encodeURIComponent(urlProjId)}`);
+          if (res.ok) {
+            const data = await res.json();
+            project = data.project || data;
+          }
+        } catch (e) {
+          console.warn('Could not fetch project by URL id:', e);
+        }
+      }
+
+      // 2. Try localStorage from Site Planner
+      if (!project) {
+        try {
+          const stored = localStorage.getItem('evision_active_project');
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            project = parsed.project_summary || parsed;
+          }
+        } catch (e) {
+          console.warn('Could not read from localStorage:', e);
+        }
+      }
+
+      // 3. Try backend latest project
+      if (!project) {
+        try {
+          const res = await fetch(`${API_BASE}/api/project/latest`);
+          if (res.ok) {
+            const data = await res.json();
+            project = data.project || data;
+          }
+        } catch (e) {
+          console.warn('Could not fetch latest project:', e);
+        }
+      }
+
+      // 4. Populate UI with active project
+      if (project) {
+        activeProjectState = project;
+        applyProjectStateToUI(project);
+      }
+    }
+
+    function applyProjectStateToUI(proj) {
+      const loc = proj.location || {};
+      const cityName = loc.city || loc.fullName || 'Pune';
+      const coords = loc.coordinates || [18.5204, 73.8567];
+      const lat = Number(coords[0]) || 18.5204;
+      const lng = Number(coords[1]) || 73.8567;
+      const vtype = proj.vehicle_type || 'Mixed';
+      const cfg = proj.charging_configuration || {};
+      const hw = `${cfg.points || 2}x ${cfg.charger_type || 'DC CCS2 Fast (50 kW)'}`;
+      const budget = Number(proj.budget || 1500000);
+      const score = proj.hotspot_score || 84.5;
+      const projId = proj.project_id || 'EV-2026-PUNE-01';
+
+      // Update Banner
+      document.getElementById('projIdBadge').textContent = projId;
+      document.getElementById('projLocText').textContent = loc.fullName || cityName;
+      document.getElementById('projVehText').textContent = vtype;
+      document.getElementById('projHwText').textContent = hw;
+      document.getElementById('projBudgetText').textContent = `₹ ${budget.toLocaleString()}`;
+      document.getElementById('projScoreText').textContent = `${score} / 100`;
+
+      // Pre-fill Feature 1: Why This Location
+      document.getElementById('locCity').value = cityName;
+      const normVType = vtype.toLowerCase().includes('two') || vtype.toLowerCase().includes('2w') ? 'Two-Wheeler' :
+                        (vtype.toLowerCase().includes('four') || vtype.toLowerCase().includes('4w') ? 'Four-Wheeler' : 'Both');
+      selectVehLoc(normVType);
+
+      // Pre-fill Feature 2: Location Insights
+      document.getElementById('insCity').value = cityName;
+      document.getElementById('insVehType').value = normVType;
+
+      // Pre-fill Feature 3: AI Simulator
+      document.getElementById('simCity').value = cityName;
+      document.getElementById('simVehMix').value = normVType;
+      const slider = document.getElementById('simBudgetSlider');
+      if (slider) {
+        slider.value = Math.min(Math.max(budget, 300000), 6000000);
+        document.getElementById('simBudgetDisplay').textContent = `₹ ${parseInt(slider.value).toLocaleString()}`;
+      }
+      if (cfg.charger_type) {
+        const simChg = document.getElementById('simChargerSelect');
+        for (let opt of simChg.options) {
+          if (opt.value.toLowerCase().includes(cfg.charger_type.toLowerCase().split(' ')[0])) {
+            simChg.value = opt.value;
+            break;
+          }
+        }
+      }
+      if (cfg.points) {
+        document.getElementById('simGunsSelect').value = String(cfg.points);
+      }
+
+      // Pre-fill Feature 4: Configuration Optimizer
+      document.getElementById('optCity').value = cityName;
+      document.getElementById('optVehMix').value = normVType;
+      const optSlider = document.getElementById('optBudgetSlider');
+      if (optSlider) {
+        optSlider.value = Math.min(Math.max(budget, 500000), 8000000);
+        document.getElementById('optBudgetDisplay').textContent = `₹ ${parseInt(optSlider.value).toLocaleString()}`;
+      }
+
+      // Automatically populate baseline metrics without waiting for user click
+      runLocationAnalysis(true);
+    }
+
+    /* -------------------------------------------------------------
+     * FEATURE 1: WHY THIS LOCATION?
+     * ------------------------------------------------------------- */
+    function setCityLoc(city) {
+      document.getElementById('locCity').value = city;
+      document.querySelectorAll('#tab-why-loc .quick-pill').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.trim().toLowerCase() === city.toLowerCase());
+      });
+    }
+
+    function selectVehLoc(vtype) {
+      currentLocVehicle = vtype;
+      document.querySelectorAll('#tab-why-loc .vehicle-card').forEach(c => {
+        c.classList.toggle('selected', c.getAttribute('data-val') === vtype);
+      });
+    }
+
+    async function runLocationAnalysis(isAuto = false) {
+      const city = document.getElementById('locCity').value.trim();
+      if (!city) return alert('Please enter a location or city.');
+
+      const btn = document.getElementById('btnAnalyzeLoc');
+      const btnText = document.getElementById('btnAnalyzeLocText');
+      if (!isAuto) {
+        btn.disabled = true;
+        btnText.textContent = 'Analyzing location...';
+      }
+
+      try {
+        const resp = await fetch(`${API_BASE}/api/ai/location-recommendation`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            location: city,
+            vehicle_type: currentLocVehicle
+          })
+        });
+
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({}));
+          throw new Error(err.error || `Server responded with status ${resp.status}`);
+        }
+
+        const data = await resp.json();
+        renderLocResult(data);
+      } catch (e) {
+        console.error('Location Analysis Error:', e);
+        if (!isAuto) {
+          const box = document.getElementById('locResultBox');
+          box.style.display = 'block';
+          document.getElementById('locResName').textContent = 'Location Analysis Unavailable';
+          document.getElementById('locResAnalysis').textContent =
+            'The EVision AI service is currently unreachable. Please verify that the backend server is running (e.g. via run.bat or python server.py on port 8000).';
+        }
+      } finally {
+        if (!isAuto) {
+          btn.disabled = false;
+          btnText.textContent = 'Analyze Location';
+        }
+      }
+    }
+
+    function renderLocResult(data) {
+      const box = document.getElementById('locResultBox');
+      box.style.display = 'block';
+
+      document.getElementById('locResName').textContent = data.recommended_location || 'Top Location Opportunity';
+      const coords = data.recommended_coordinates || { lat: 18.5204, lng: 73.8567 };
+      cachedLocationCoords = coords;
+      cachedLocationName = data.recommended_location || '';
+      document.getElementById('locResCoords').textContent = `LAT: ${coords.lat.toFixed(4)}°, LNG: ${coords.lng.toFixed(4)}°`;
+
+      document.getElementById('locResScore').innerHTML = `${data.ml_hotspot_score} <span style="font-size:13px;color:var(--text-muted);">/ 100</span>`;
+      document.getElementById('locResStrength').textContent = data.recommendation_rating || 'High Opportunity';
+      document.getElementById('locResRating').textContent = data.recommendation_rating ? data.recommendation_rating.toUpperCase() : 'RECOMMENDED';
+
+      const infra = data.existing_infrastructure || {};
+      document.getElementById('locResStations').textContent = `${infra.total_stations || 0} Stations`;
+      document.getElementById('locResStationBreakdown').textContent = `${infra.fast_chargers || 0} Fast DC • ${infra.ac_chargers || 0} AC`;
+
+      const whyList = document.getElementById('locResWhyList');
+      whyList.innerHTML = '';
+      (data.why_this_location || []).forEach(item => {
+        const li = document.createElement('li');
+        li.className = 'bullet-item';
+        li.innerHTML = `<span class="bullet-icon">✓</span><span>${escapeHtml(item)}</span>`;
+        whyList.appendChild(li);
+      });
+
+      document.getElementById('locResGap').textContent = data.infrastructure_gap || 'Infrastructure deficit evaluated against mobility volume.';
+      document.getElementById('locResAnalysis').textContent = data.ai_analysis || 'Positive commercial feasibility indicators for charging deployment.';
+
+      const consList = document.getElementById('locResConsiderations');
+      consList.innerHTML = '';
+      (data.important_considerations || []).forEach(item => {
+        const li = document.createElement('li');
+        li.className = 'bullet-item';
+        li.innerHTML = `<span class="material-symbols-outlined" style="font-size:15px;color:var(--text-muted);flex-shrink:0;">info</span><span>${escapeHtml(item)}</span>`;
+        consList.appendChild(li);
+      });
+    }
+
+    function openMapView(e) {
+      if (e) e.preventDefault();
+      const coords = cachedLocationCoords || { lat: 18.5204, lng: 73.8567 };
+      const name = encodeURIComponent(cachedLocationName || '');
+      window.location.href = `site-planner/dashboard.html?lat=${coords.lat}&lng=${coords.lng}&loc=${name}`;
+    }
+
+    /* -------------------------------------------------------------
+     * FEATURE 2: LOCATION INSIGHTS
+     * ------------------------------------------------------------- */
+    function setCityIns(city) {
+      document.getElementById('insCity').value = city;
+      document.querySelectorAll('#tab-insights .quick-pill').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.trim().toLowerCase() === city.toLowerCase());
+      });
+    }
+
+    async function runLocationInsights() {
+      const city = document.getElementById('insCity').value.trim();
+      const vtype = document.getElementById('insVehType').value;
+      if (!city) return alert('Please enter a location.');
+
+      const btn = document.getElementById('btnRunInsights');
+      const btnText = document.getElementById('btnRunInsightsText');
+      btn.disabled = true;
+      btnText.textContent = 'Generating infrastructure insights...';
+
+      try {
+        const [respExpl, respRec] = await Promise.all([
+          fetch(`${API_BASE}/api/ai/location-explanation`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ location: city, vehicle_type: vtype })
+          }),
+          fetch(`${API_BASE}/api/ai/location-recommendation`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ location: city, vehicle_type: vtype })
+          })
+        ]);
+
+        if (!respExpl.ok) {
+          const err = await respExpl.json().catch(() => ({}));
+          throw new Error(err.error || `Server responded with status ${respExpl.status}`);
+        }
+
+        const dataExpl = await respExpl.json();
+        const dataRec = await respRec.json().catch(() => ({}));
+        renderInsightsResult(dataExpl, dataRec);
+      } catch (e) {
+        console.error('Insights Error:', e);
+        const box = document.getElementById('insResultBox');
+        box.style.display = 'block';
+        document.getElementById('insResName').textContent = 'Location Insights Unavailable';
+        document.getElementById('insResSummary').textContent =
+          'The EVision AI service is currently unreachable. Please verify that the backend server is running on http://localhost:8000.';
+      } finally {
+        btn.disabled = false;
+        btnText.textContent = 'Explore Insights';
+      }
+    }
+
+    function renderInsightsResult(expl, rec) {
+      const box = document.getElementById('insResultBox');
+      box.style.display = 'block';
+
+      document.getElementById('insResName').textContent = expl.recommended_location || 'Location Insights';
+      document.getElementById('insResSuitability').textContent = expl.ai_assessment ? expl.ai_assessment.toUpperCase() : 'STRONG FEASIBILITY';
+      document.getElementById('insResScore').textContent = `${expl.ml_hotspot_score} / 100`;
+
+      const m = expl.raw_metrics || {};
+      document.getElementById('insResTargetVeh').textContent = (m.target_registrations || 0).toLocaleString();
+      document.getElementById('insResTotalVeh').textContent = `Total: ${(m.total_registrations || 0).toLocaleString()} vehicles`;
+      document.getElementById('insResEvShare').textContent = `${m.ev_penetration_pct || 0}%`;
+      document.getElementById('insResCoverage').textContent = `${m.existing_stations || 0} Stations`;
+      document.getElementById('insResFastCount').textContent = `${m.fast_chargers || 0} Fast DC • ${m.ac_chargers || 0} AC`;
+
+      document.getElementById('insResComp').textContent = expl.competition || 'Available infrastructure evaluated across corridor.';
+      document.getElementById('insResGap').textContent = expl.infrastructure_gap || 'Infrastructure deficit evaluated against mobility volume.';
+      document.getElementById('insResSummary').textContent = expl.ai_summary || 'Positive commercial feasibility indicators for charging deployment.';
+
+      const tbody = document.getElementById('insResTableBody');
+      tbody.innerHTML = '';
+      const cands = rec.candidates_evaluated || [];
+      cands.forEach((c, idx) => {
+        const tr = document.createElement('tr');
+        if (idx === 0) tr.className = 'highlight';
+        tr.innerHTML = `
+          <td><span class="mono-tag ${idx === 0 ? 'orange' : ''}">#0${idx + 1}</span></td>
+          <td><strong>${escapeHtml(c.name)}</strong><br><span style="font-size:11px;color:var(--text-muted);">${escapeHtml(c.area)}</span></td>
+          <td><strong>${c.ml_hotspot_score}</strong></td>
+          <td>${(c.target_registrations || 0).toLocaleString()}</td>
+          <td>${(c.total_registrations || 0).toLocaleString()}</td>
+          <td>${c.ev_penetration_pct}%</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    /* -------------------------------------------------------------
+     * FEATURE 3: AI SIMULATOR
+     * ------------------------------------------------------------- */
+    function toggleComparison() {
+      isComparingSim = !isComparingSim;
+      const box = document.getElementById('scenarioBBox');
+      const text = document.getElementById('btnToggleCompText');
+      if (isComparingSim) {
+        box.classList.add('show');
+        text.textContent = '✕ Remove Scenario B Comparison';
+      } else {
+        box.classList.remove('show');
+        text.textContent = '+ Compare with Scenario B';
+      }
+    }
+
+    async function runSimulatorAction() {
+      const loc = document.getElementById('simCity').value.trim();
+      const vtype = document.getElementById('simVehMix').value;
+      const budget = parseFloat(document.getElementById('simBudgetSlider').value);
+      const charger = document.getElementById('simChargerSelect').value;
+      const guns = parseInt(document.getElementById('simGunsSelect').value, 10);
+
+      const btn = document.getElementById('btnRunSimulator');
+      const btnText = document.getElementById('btnRunSimulatorText');
+      btn.disabled = true;
+      btnText.textContent = 'Calculating simulation...';
+
+      const payload = {
+        location: loc,
+        vehicle_type: vtype,
+        budget: budget,
+        charger_type: charger,
+        points: guns
+      };
+
+      if (isComparingSim) {
+        payload.scenario_b = {
+          budget: parseFloat(document.getElementById('simBudgetBInput').value),
+          charger_type: document.getElementById('simChargerBSelect').value,
+          points: parseInt(document.getElementById('simGunsBSelect').value, 10)
+        };
+      }
+
+      try {
+        const resp = await fetch(`${API_BASE}/api/ai/simulation-analysis`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({}));
+          throw new Error(err.error || `Server responded with status ${resp.status}`);
+        }
+
+        const data = await resp.json();
+        renderSimResult(data);
+      } catch (e) {
+        console.error('Simulator Error:', e);
+        const box = document.getElementById('simResultBox');
+        box.style.display = 'block';
+        document.getElementById('simResHeading').textContent = 'Simulation Analysis Unavailable';
+        document.getElementById('simResAiOverview').textContent =
+          'The EVision AI service is currently unreachable. Please verify that the backend server is running on http://localhost:8000.';
+      } finally {
+        btn.disabled = false;
+        btnText.textContent = 'Run Simulation';
+      }
+    }
+
+    function renderSimResult(data) {
+      const box = document.getElementById('simResultBox');
+      box.style.display = 'block';
+
+      const sa = data.scenario_a || {};
+      document.getElementById('simResHeading').textContent = `${sa.points}x ${sa.charger_type} (${sa.location})`;
+      document.getElementById('simResRev').textContent = `₹ ${(sa.estimated_revenue_monthly || 0).toLocaleString()}`;
+      document.getElementById('simResEnergyText').textContent = `${(sa.monthly_energy_kwh || 0).toLocaleString()} kWh/mo • ${sa.expected_sessions_monthly || 0} sessions`;
+      document.getElementById('simResCost').textContent = `₹ ${(sa.estimated_cost_monthly || 0).toLocaleString()}`;
+      document.getElementById('simResProfit').textContent = `₹ ${(sa.estimated_profit_monthly || 0).toLocaleString()}`;
+      document.getElementById('simResAnnualProfitText').textContent = `Annual: ₹ ${(sa.estimated_profit_annual || 0).toLocaleString()}`;
+      document.getElementById('simResRoiText').textContent = `${sa.roi_pct || 0}%`;
+      document.getElementById('simResPaybackText').textContent = `Payback: ${sa.payback_period_years} yrs (${sa.utilization_pct}% Util)`;
+
+      const ai = data.ai_analysis || {};
+      document.getElementById('simResAiOverview').textContent = ai.overview || 'Financial metrics calculated based on local power tariffs and charging demand.';
+
+      const strList = document.getElementById('simResStrengthsList');
+      strList.innerHTML = '';
+      (ai.strengths || []).forEach(item => {
+        const li = document.createElement('li');
+        li.className = 'bullet-item';
+        li.innerHTML = `<span class="bullet-icon">✓</span><span>${escapeHtml(item)}</span>`;
+        strList.appendChild(li);
+      });
+
+      const wkList = document.getElementById('simResWeaknessesList');
+      wkList.innerHTML = '';
+      (ai.weaknesses || []).forEach(item => {
+        const li = document.createElement('li');
+        li.className = 'bullet-item';
+        li.innerHTML = `<span class="material-symbols-outlined" style="font-size:15px;color:var(--accent-orange);flex-shrink:0;">error_outline</span><span>${escapeHtml(item)}</span>`;
+        wkList.appendChild(li);
+      });
+
+      const rkList = document.getElementById('simResRisksList');
+      rkList.innerHTML = '';
+      (ai.potential_risks || []).forEach(item => {
+        const li = document.createElement('li');
+        li.className = 'bullet-item';
+        li.innerHTML = `<span class="material-symbols-outlined" style="font-size:15px;color:var(--text-muted);flex-shrink:0;">warning</span><span>${escapeHtml(item)}</span>`;
+        rkList.appendChild(li);
+      });
+
+      const sb = data.scenario_b;
+      const compWrap = document.getElementById('simCompWrap');
+      if (sb) {
+        compWrap.style.display = 'block';
+        const tbody = document.getElementById('simCompTableBody');
+        tbody.innerHTML = `
+          <tr>
+            <td><strong>CapEx Investment</strong></td>
+            <td>₹ ${sa.budget.toLocaleString()}</td>
+            <td>₹ ${sb.budget.toLocaleString()}</td>
+            <td>+₹ ${(sb.budget - sa.budget).toLocaleString()}</td>
+          </tr>
+          <tr>
+            <td><strong>Monthly Revenue</strong></td>
+            <td>₹ ${sa.estimated_revenue_monthly.toLocaleString()}</td>
+            <td>₹ ${sb.estimated_revenue_monthly.toLocaleString()}</td>
+            <td>+₹ ${(sb.estimated_revenue_monthly - sa.estimated_revenue_monthly).toLocaleString()}</td>
+          </tr>
+          <tr>
+            <td><strong>Monthly Net Profit</strong></td>
+            <td>₹ ${sa.estimated_profit_monthly.toLocaleString()}</td>
+            <td>₹ ${sb.estimated_profit_monthly.toLocaleString()}</td>
+            <td><strong style="color:var(--accent-orange);">+₹ ${(sb.estimated_profit_monthly - sa.estimated_profit_monthly).toLocaleString()}</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Annual ROI (%)</strong></td>
+            <td>${sa.roi_pct}%</td>
+            <td>${sb.roi_pct}%</td>
+            <td>${(sb.roi_pct - sa.roi_pct).toFixed(1)}%</td>
+          </tr>
+          <tr>
+            <td><strong>Payback Period</strong></td>
+            <td>${sa.payback_period_years} yrs</td>
+            <td>${sb.payback_period_years} yrs</td>
+            <td>${typeof sb.payback_period_years === 'number' ? (sb.payback_period_years - sa.payback_period_years).toFixed(2) + ' yrs' : 'N/A'}</td>
+          </tr>
+        `;
+        document.getElementById('simCompVerdict').innerHTML = `<strong>Scenario Comparison:</strong> ${escapeHtml(ai.comparison_verdict || 'Comparison computed.')}`;
+      } else {
+        compWrap.style.display = 'none';
+      }
+
+      box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    /* -------------------------------------------------------------
+     * FEATURE 4: CONFIGURATION OPTIMIZER
+     * ------------------------------------------------------------- */
+    async function runOptimizerAction() {
+      const loc = document.getElementById('optCity').value.trim();
+      const vtype = document.getElementById('optVehMix').value;
+      const budget = parseFloat(document.getElementById('optBudgetSlider').value);
+      const goal = document.getElementById('optGoalSelect').value;
+
+      const btn = document.getElementById('btnRunOptimizer');
+      const btnText = document.getElementById('btnRunOptimizerText');
+      btn.disabled = true;
+      btnText.textContent = 'Optimizing setup...';
+
+      try {
+        const resp = await fetch(`${API_BASE}/api/ai/configuration-optimization`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            location: loc,
+            vehicle_type: vtype,
+            budget: budget,
+            goal: goal
+          })
+        });
+
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({}));
+          throw new Error(err.error || `Server responded with status ${resp.status}`);
+        }
+
+        const data = await resp.json();
+        renderOptimizerResult(data);
+      } catch (e) {
+        console.error('Optimizer Error:', e);
+        const box = document.getElementById('optResultBox');
+        box.style.display = 'block';
+        document.getElementById('optResTitle').textContent = 'Configuration Optimization Unavailable';
+        document.getElementById('optResWhyText').textContent =
+          'The EVision AI service is currently unreachable. Please verify that the backend server is running on http://localhost:8000.';
+      } finally {
+        btn.disabled = false;
+        btnText.textContent = 'Optimize Setup';
+      }
+    }
+
+    function renderOptimizerResult(data) {
+      const box = document.getElementById('optResultBox');
+      box.style.display = 'block';
+
+      const rec = data.recommended_configuration || {};
+      document.getElementById('optResTitle').textContent = rec.config_name || 'Recommended Setup';
+      document.getElementById('optResSubtitle').textContent = `${rec.points} Guns • ${rec.charger_type} in ${data.location}`;
+      document.getElementById('optResGoalBadge').textContent = `GOAL: ${data.optimization_goal.replace('_', ' ').toUpperCase()}`;
+
+      document.getElementById('optResCapex').textContent = `₹ ${(rec.capex_inr || rec.budget || 0).toLocaleString()}`;
+      document.getElementById('optResGuns').textContent = `${rec.points} Guns (${rec.charger_type})`;
+      document.getElementById('optResPowerText').textContent = `${rec.total_power_kw || 0} kW`;
+      document.getElementById('optResProfitText').textContent = `₹ ${(rec.estimated_profit_monthly || 0).toLocaleString()}`;
+      document.getElementById('optResRevText').textContent = `Revenue: ₹ ${(rec.estimated_revenue_monthly || 0).toLocaleString()}`;
+      document.getElementById('optResRoiText').textContent = `${rec.roi_pct || 0}%`;
+      document.getElementById('optResPaybackText').textContent = `Payback: ${rec.payback_period_years} yrs`;
+
+      document.getElementById('optResWhyText').textContent = data.why_this_configuration || 'Recommended setup based on requested investment goal.';
+
+      const advList = document.getElementById('optResAdvList');
+      advList.innerHTML = '';
+      (data.key_advantages || []).forEach(item => {
+        const li = document.createElement('li');
+        li.className = 'bullet-item';
+        li.innerHTML = `<span class="bullet-icon">✓</span><span>${escapeHtml(item)}</span>`;
+        advList.appendChild(li);
+      });
+
+      const altBody = document.getElementById('optResAltsBody');
+      altBody.innerHTML = '';
+      (data.alternative_configurations || []).forEach((alt, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><span class="mono-tag">Alt 0${idx + 1}</span></td>
+          <td><strong>${escapeHtml(alt.config_name)}</strong><br><span style="font-size:11px;color:var(--text-muted);">${alt.points}x ${escapeHtml(alt.charger_type)}</span></td>
+          <td>₹ ${(alt.capex_inr || alt.budget || 0).toLocaleString()}</td>
+          <td>${alt.total_power_kw} kW</td>
+          <td><strong style="color:var(--accent-orange);">₹ ${(alt.estimated_profit_monthly || 0).toLocaleString()}</strong></td>
+          <td>${alt.roi_pct}%</td>
+          <td>${alt.payback_period_years} yrs</td>
+        `;
+        altBody.appendChild(tr);
+      });
+
+      box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Auto-load Active Project on Page Load
+    window.addEventListener('DOMContentLoaded', () => {
+      loadActiveProject();
+    });
+  </script>
+</body>
+
+</html>

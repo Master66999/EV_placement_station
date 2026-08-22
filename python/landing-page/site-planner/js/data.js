@@ -48,8 +48,11 @@ const EVisionDataService = {
    * @returns {Promise<Object>} Formatted analysis response
    */
   async generateAnalysis(formData) {
+    const API_BASE = (window.location.protocol === 'file:' || (!window.location.port.includes('8000') && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')))
+      ? 'http://127.0.0.1:8000'
+      : '';
     try {
-      const response = await fetch('/api/v1/site-planner/analyze', {
+      const response = await fetch(`${API_BASE}/api/v1/site-planner/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -57,6 +60,29 @@ const EVisionDataService = {
       if (response.ok) {
         const data = await response.json();
         console.log('[EVISION ML ENGINE] Received live inference from backend:', data);
+
+        // Save active project in client-side localStorage
+        const projectPayload = {
+          project_id: data.project_id || ('EV-' + Math.floor(100000 + Math.random() * 900000)),
+          formData: formData,
+          analysis: data,
+          project_summary: data.project_summary,
+          timestamp: new Date().toISOString()
+        };
+        try {
+          localStorage.setItem('evision_active_project', JSON.stringify(projectPayload));
+          const aiBtn = document.getElementById('btn-nav-research-ai');
+          if (aiBtn) {
+            aiBtn.href = `../research-ai.html?project_id=${encodeURIComponent(projectPayload.project_id)}`;
+          }
+          const verdictAiBtn = document.getElementById('btn-verdict-research-ai');
+          if (verdictAiBtn) {
+            verdictAiBtn.href = `../research-ai.html?project_id=${encodeURIComponent(projectPayload.project_id)}`;
+          }
+        } catch (e) {
+          console.warn('Could not save to localStorage:', e);
+        }
+
         return data;
       }
     } catch (err) {
@@ -66,6 +92,15 @@ const EVisionDataService = {
     return new Promise((resolve) => {
       setTimeout(() => {
         const response = this._buildMockResponse(formData);
+        const projectPayload = {
+          project_id: 'EV-' + Math.floor(100000 + Math.random() * 900000),
+          formData: formData,
+          analysis: response,
+          timestamp: new Date().toISOString()
+        };
+        try {
+          localStorage.setItem('evision_active_project', JSON.stringify(projectPayload));
+        } catch (e) {}
         resolve(response);
       }, 1200);
     });

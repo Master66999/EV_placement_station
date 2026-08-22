@@ -2,12 +2,40 @@ import http.server
 import socketserver
 import os
 import json
+import datetime
+import math
 import urllib.parse
+import urllib.request
 import pandas as pd
 import joblib
 
 PORT = 8000
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
+
+# ── Automatically load .env file if present ──
+def load_env_file():
+    env_paths = [
+        os.path.join(DIRECTORY, ".env"),
+        os.path.join(DIRECTORY, "..", ".env"),
+        os.path.join(DIRECTORY, "..", "..", ".env")
+    ]
+    for p in env_paths:
+        if os.path.exists(p):
+            try:
+                with open(p, "r", encoding="utf-8") as f:
+                    for line in f:
+                        line = line.strip()
+                        if line and not line.startswith("#") and "=" in line:
+                            k, v = line.split("=", 1)
+                            k, v = k.strip(), v.strip().strip('"').strip("'")
+                            if k:
+                                os.environ[k] = v
+                print(f"[SUCCESS] Loaded environment variables from: {p}")
+                break
+            except Exception as ex:
+                print(f"[WARN] Error reading .env from {p}: {ex}")
+
+load_env_file()
 
 # ── Load Model and Metadata once at startup ──
 MODEL_PATH = os.path.abspath(os.path.join(DIRECTORY, "..", "models", "ev_hotspot_model.pkl"))
@@ -92,6 +120,56 @@ RTO_COORDINATES = {
     "Guntur Rta": {"lat": 16.3067, "lng": 80.4365}
 }
 
+DEFAULT_PROJECT = {
+    "project_id": "EV-2026-PUNE-01",
+    "location": {
+        "city": "Pune",
+        "fullName": "Pune — MH12 Corridor, Maharashtra",
+        "coordinates": [18.5204, 73.8567],
+        "rto": "Pune — MH12 Zone"
+    },
+    "vehicle_type": "Mixed (2W + 4W)",
+    "vehicle_mix": ["4w", "2w"],
+    "budget": 1500000,
+    "budget_formatted": "₹ 15,00,000",
+    "charging_configuration": {
+        "charger_type": "DC CCS2 Fast (50 kW)",
+        "points": 2,
+        "total_power_kw": 100
+    },
+    "hotspot_score": 84.5,
+    "ml_demand_score": 82.0,
+    "existing_stations_count": 30,
+    "competitors": [
+        {"id": "comp_1", "name": "Tata Power EZ Charge (Pune Corridor)", "distanceKm": 1.2, "guns": "2x 50kW DC", "operator": "Tata Power", "lat": 18.525, "lng": 73.858},
+        {"id": "comp_2", "name": "Jio-BP Pulse Hub (Pune South)", "distanceKm": 2.4, "guns": "2x 60kW DC", "operator": "Jio-bp", "lat": 18.515, "lng": 73.852}
+    ],
+    "financials": {
+        "monthly_revenue": 142500,
+        "monthly_profit": 66459,
+        "roi_pct": 53.2,
+        "payback_months": 22.5,
+        "payback_years": 1.9
+    },
+    "demographics": {
+        "total_evs": 131273,
+        "ev_penetration_pct": 10.22,
+        "catchment_population": 360000
+    },
+    "grid": {
+        "available_headroom_kva": 650,
+        "substation_name": "110/33/11 kV State Grid Substation",
+        "distance_km": 0.9
+    },
+    "timestamp": datetime.datetime.now().isoformat()
+}
+
+PROJECTS_STORE = {
+    "EV-2026-PUNE-01": DEFAULT_PROJECT,
+    "latest": DEFAULT_PROJECT,
+    "active": DEFAULT_PROJECT
+}
+
 class LandingPageHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=DIRECTORY, **kwargs)
@@ -116,12 +194,16 @@ class LandingPageHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             return os.path.join(DIRECTORY, 'register.html')
         elif clean_path in ['/dashboard', '/dashboard.html', '/site-planner']:
             return os.path.join(DIRECTORY, 'site-planner', 'dashboard.html')
+        elif clean_path in ['/research-ai', '/research-ai.html', '/research_ai.html']:
+            return os.path.join(DIRECTORY, 'research-ai.html')
         return super().translate_path(path)
 
     def do_GET(self):
         parsed_url = urllib.parse.urlparse(self.path)
         if parsed_url.path == '/api/stations':
             self.handle_get_stations(parsed_url.query)
+        elif parsed_url.path.startswith('/api/project') or parsed_url.path.startswith('/api/projects'):
+            self.handle_get_project(parsed_url.path)
         else:
             super().do_GET()
 
@@ -130,13 +212,23 @@ class LandingPageHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         print(f"[DEBUG do_POST] Received path: '{self.path}', parsed: '{parsed}'")
         if parsed in ['/api/v1/site-planner/analyze', '/api/site-planner/analyze']:
             self.handle_site_planner_analyze()
-        elif parsed == '/api/hotspots/predict':
+        elif parsed in ['/api/project/save', '/api/projects/save']:
+            self.handle_save_project()
+        elif parsed in ['/api/hotspots/predict', '/api/hotspot/predict']:
             self.handle_predict_hotspots()
-        elif parsed == '/api/business/predict':
+        elif parsed in ['/api/ai/location-recommendation', '/api/ai/location-recommend', '/api/ai/why-location', '/api/ai/why-this-location']:
+            self.handle_ai_location_recommendation()
+        elif parsed in ['/api/ai/location-explanation', '/api/ai/location-insights', '/api/ai/insights']:
+            self.handle_ai_location_explanation()
+        elif parsed in ['/api/ai/simulation-analysis', '/api/ai/simulator', '/api/ai/simulate']:
+            self.handle_ai_simulation_analysis()
+        elif parsed in ['/api/ai/configuration-optimization', '/api/ai/config-optimizer', '/api/ai/optimize']:
+            self.handle_ai_configuration_optimization()
+        elif parsed in ['/api/business/predict', '/api/business/simulate']:
             self.handle_predict_business()
         else:
             print(f"[DEBUG do_POST] 404 No match for '{parsed}'")
-            self.send_error(404, "API endpoint not found")
+            self.send_json_response({"error": f"API endpoint '{parsed}' not found."}, 404)
 
     def handle_site_planner_analyze(self):
         global pipeline, rto_df, stations_df
@@ -521,11 +613,113 @@ class LandingPageHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 }
             }
 
+            # Generate and register shared project state
+            import random, datetime
+            project_id = f"EV-{datetime.datetime.now().strftime('%Y%m%d')}-{random.randint(100, 999)}"
+            city_clean = location_name.split(",")[0].split("—")[0].strip()
+            v_type_label = "Mixed (2W + 4W)" if ('4w' in vehicle_mix and '2w' in vehicle_mix) else ("Four-Wheeler" if '4w' in vehicle_mix else "Two-Wheeler")
+            
+            project_summary = {
+                "project_id": project_id,
+                "location": {
+                    "city": city_clean,
+                    "fullName": location_name,
+                    "coordinates": [lat, lng],
+                    "rto": nearest_rto_row['office_name'] if nearest_rto_row is not None else "Regional RTO"
+                },
+                "vehicle_type": v_type_label,
+                "vehicle_mix": vehicle_mix,
+                "budget": total_capex * 100000,
+                "budget_formatted": f"₹ {round(total_capex, 1)} Lakhs",
+                "charging_configuration": {
+                    "charger_type": recommended_mix[0]["type"] if recommended_mix else "DC CCS2 Fast (50 kW)",
+                    "points": sum(item.get("units", 1) for item in recommended_mix) if recommended_mix else 2,
+                    "total_power_kw": total_kw
+                },
+                "hotspot_score": overall_score,
+                "ml_demand_score": demand_score,
+                "existing_stations_count": len(competitors),
+                "competitors": competitors,
+                "financials": {
+                    "monthly_revenue": monthly_gross,
+                    "monthly_profit": monthly_profit,
+                    "roi_pct": annual_roi,
+                    "payback_months": payback_months,
+                    "payback_years": round(payback_months / 12, 1)
+                },
+                "demographics": {
+                    "total_evs": total_evs,
+                    "ev_penetration_pct": 4.8,
+                    "catchment_population": base_pop
+                },
+                "grid": {
+                    "available_headroom_kva": 650,
+                    "substation_name": "110/33/11 kV State Grid Substation",
+                    "distance_km": 0.9
+                },
+                "timestamp": datetime.datetime.now().isoformat()
+            }
+
+            PROJECTS_STORE[project_id] = project_summary
+            PROJECTS_STORE['latest'] = project_summary
+            PROJECTS_STORE['active'] = project_summary
+
+            response_data["project_id"] = project_id
+            response_data["project_summary"] = project_summary
+
             self.send_json_response(response_data, 200)
 
         except Exception as e:
             print(f"[API ERROR] Site Planner Analyze failed: {e}")
             self.send_json_response({"error": f"Site Planner backend error: {str(e)}"}, 500)
+
+    def handle_get_project(self, path):
+        global PROJECTS_STORE
+        try:
+            parts = path.strip("/").split("/")
+            # e.g., ['api', 'project', 'EV-123'] or ['api', 'projects', 'latest']
+            proj_id = parts[-1] if len(parts) >= 3 else 'latest'
+            if proj_id in ['', 'project', 'projects']:
+                proj_id = 'latest'
+
+            project = PROJECTS_STORE.get(proj_id) or PROJECTS_STORE.get('latest') or PROJECTS_STORE.get('EV-2026-PUNE-01')
+            if project:
+                self.send_json_response({
+                    "status": "success",
+                    "project_id": project.get("project_id", proj_id),
+                    "project": project
+                }, 200)
+            else:
+                self.send_json_response({"error": f"Project '{proj_id}' not found."}, 404)
+        except Exception as e:
+            print(f"[API ERROR] Get Project failed: {e}")
+            self.send_json_response({"error": f"Get Project error: {str(e)}"}, 500)
+
+    def handle_save_project(self):
+        global PROJECTS_STORE
+        try:
+            content_length = int(self.headers.get('Content-Length', 0))
+            post_data = self.rfile.read(content_length)
+            payload = json.loads(post_data.decode('utf-8'))
+            
+            project_id = payload.get('project_id') or f"EV-{datetime.datetime.now().strftime('%Y%m%d')}-{random.randint(100, 999)}"
+            payload['project_id'] = project_id
+            payload['timestamp'] = datetime.datetime.now().isoformat()
+            
+            PROJECTS_STORE[project_id] = payload
+            PROJECTS_STORE['latest'] = payload
+            PROJECTS_STORE['active'] = payload
+            
+            print(f"[API SUCCESS] Saved project '{project_id}'")
+            self.send_json_response({
+                "status": "success",
+                "message": f"Project '{project_id}' successfully saved.",
+                "project_id": project_id,
+                "project": payload
+            }, 200)
+        except Exception as e:
+            print(f"[API ERROR] Save Project failed: {e}")
+            self.send_json_response({"error": f"Save Project error: {str(e)}"}, 500)
 
     def handle_predict_hotspots(self):
         global pipeline, rto_df
@@ -687,6 +881,1021 @@ class LandingPageHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             # Do not expose python stack traces to frontend, log internally and send general error
             print(f"[API ERROR] Prediction handler failed: {e}")
             self.send_json_response({"error": "Internal server error occurred during prediction analysis."}, 500)
+
+    def handle_ai_location_recommendation(self):
+        global pipeline, rto_df, stations_df
+        
+        if pipeline is None or rto_df is None:
+            self.send_json_response({"error": "ML Model or RTO metadata is not loaded on the server."}, 500)
+            return
+
+        try:
+            content_length = int(self.headers.get('Content-Length', 0))
+            post_data = self.rfile.read(content_length)
+            request_data = json.loads(post_data.decode('utf-8'))
+            
+            location = request_data.get('location', '').strip()
+            vehicle_type = request_data.get('vehicle_type', 'Both').strip()
+            
+            if not location:
+                self.send_json_response({"error": "Missing 'location' parameter."}, 400)
+                return
+                
+            if vehicle_type not in ["Two-Wheeler", "Four-Wheeler", "Both"]:
+                vehicle_type = "Both"
+
+            print(f"[API AI] Location Recommendation request: location='{location}', vehicle_type='{vehicle_type}'")
+
+            # 1. Location -> RTO Mapping
+            q = location.strip().lower()
+            city_map = {
+                "bengaluru": ["bengaluru central rto", "bengaluru east rto", "bengaluru north rto", "bengaluru south rto", "bengaluru west rto", "chandapura, bengaluru rto"],
+                "bangalore": ["bengaluru central rto", "bengaluru east rto", "bengaluru north rto", "bengaluru south rto", "bengaluru west rto", "chandapura, bengaluru rto"],
+                "mumbai": ["mumbai (central)", "mumbai (east)", "mumbai (west)", "vashi (new mumbai)"],
+                "delhi ncr": ["south delhi", "dwarka", "janakpuri", "rohini", "vasant vihar", "surajmal vihar"],
+                "delhi": ["south delhi", "dwarka", "janakpuri", "rohini", "vasant vihar", "surajmal vihar"],
+                "pune": ["pune", "dy rto pimpri chinchwad"],
+                "chennai": ["chennai (central) rto", "chennai (east) rto", "chennai (north) rto", "chennai (west) rto", "chennai (south) rto"],
+                "ahmedabad": ["ahmedabad", "ahmedabad east"],
+                "jaipur": ["jaipur (first) rto", "jaipur (second) rto", "vidhyadhar nagar,jaipur dto"],
+                "lucknow": ["mahanagar arto lucknow (up321)", "transport nagar rto lucknow (up32)"],
+                "kochi": ["ernakulam rto", "muvattupuzha rto"],
+                "hyderabad": ["vijayawada rta", "guntur rta"]
+            }
+            
+            matched_names = []
+            for city_key, names in city_map.items():
+                if city_key in q or q in city_key:
+                    matched_names.extend(names)
+            
+            matches = pd.DataFrame()
+            if matched_names:
+                matches = rto_df[rto_df['office_name'].str.lower().isin(matched_names)]
+                
+            if matches.empty:
+                matches = rto_df[
+                    rto_df['office_name'].str.lower().str.contains(q, na=False) |
+                    rto_df['state_name'].str.lower().str.contains(q, na=False)
+                ]
+                
+            if matches.empty:
+                self.send_json_response({
+                    "error": f"No registered RTO locations matched query '{location}'. Please try a major city (e.g. Pune, Bengaluru, Mumbai, Delhi)."
+                }, 404)
+                return
+
+            matches = matches.drop_duplicates(subset=['office_code'])
+
+            # 2. Run Machine Learning Model (Random Forest) for each candidate RTO
+            if vehicle_type == 'Both':
+                tw_reg = matches['two_wheeler_registrations']
+                tw_ratio = matches['tw_ratio']
+                features_tw = pd.DataFrame({
+                    'state_name': matches['state_name'],
+                    'vehicle_type': ['Two-Wheeler'] * len(matches),
+                    'total_registrations': matches['total_registrations'],
+                    'target_vehicle_registrations': tw_reg,
+                    'target_vehicle_ratio': tw_ratio,
+                    'state_ev_penetration_avg': matches['state_ev_penetration_avg']
+                })
+                scores_tw = pipeline.predict(features_tw)
+                
+                fw_reg = matches['four_wheeler_registrations']
+                fw_ratio = matches['fw_ratio']
+                features_fw = pd.DataFrame({
+                    'state_name': matches['state_name'],
+                    'vehicle_type': ['Four-Wheeler'] * len(matches),
+                    'total_registrations': matches['total_registrations'],
+                    'target_vehicle_registrations': fw_reg,
+                    'target_vehicle_ratio': fw_ratio,
+                    'state_ev_penetration_avg': matches['state_ev_penetration_avg']
+                })
+                scores_fw = pipeline.predict(features_fw)
+                scores = (scores_tw + scores_fw) / 2
+            else:
+                target_reg = matches['two_wheeler_registrations'] if vehicle_type == 'Two-Wheeler' else matches['four_wheeler_registrations']
+                target_ratio = matches['tw_ratio'] if vehicle_type == 'Two-Wheeler' else matches['fw_ratio']
+                features_df = pd.DataFrame({
+                    'state_name': matches['state_name'],
+                    'vehicle_type': [vehicle_type] * len(matches),
+                    'total_registrations': matches['total_registrations'],
+                    'target_vehicle_registrations': target_reg,
+                    'target_vehicle_ratio': target_ratio,
+                    'state_ev_penetration_avg': matches['state_ev_penetration_avg']
+                })
+                scores = pipeline.predict(features_df)
+
+            # 3. Compile Real Candidate Locations
+            candidates = []
+            for idx, (_, row) in enumerate(matches.iterrows()):
+                score_val = float(scores[idx])
+                score_val = round(min(max(score_val, 0.0), 100.0), 1)
+                
+                c_coords = RTO_COORDINATES.get(row['office_name'], None)
+                if not c_coords:
+                    c_coords = {"lat": 18.5204, "lng": 73.8567}
+                    
+                total_reg = int(row['total_registrations']) if pd.notna(row['total_registrations']) else 0
+                tw_reg_val = int(row['two_wheeler_registrations']) if pd.notna(row['two_wheeler_registrations']) else 0
+                fw_reg_val = int(row['four_wheeler_registrations']) if pd.notna(row['four_wheeler_registrations']) else 0
+                ev_pen = float(row['ev_penetration']) if pd.notna(row['ev_penetration']) else 0.0
+                target_reg_val = tw_reg_val if vehicle_type == 'Two-Wheeler' else fw_reg_val if vehicle_type == 'Four-Wheeler' else (tw_reg_val + fw_reg_val)
+
+                candidates.append({
+                    "name": str(row['office_name']),
+                    "area": f"{row['office_code']} Zone, {row['state_name']}",
+                    "state": str(row['state_name']),
+                    "ml_hotspot_score": score_val,
+                    "total_registrations": total_reg,
+                    "target_registrations": target_reg_val,
+                    "two_wheeler_registrations": tw_reg_val,
+                    "four_wheeler_registrations": fw_reg_val,
+                    "ev_penetration_pct": round(ev_pen * 100, 2),
+                    "coordinates": c_coords
+                })
+
+            candidates.sort(key=lambda x: x['ml_hotspot_score'], reverse=True)
+            top_candidate = candidates[0]
+
+            # 4. Query Real Existing Charging Station Data for this City
+            existing_stations_count = 0
+            fast_count = 0
+            ac_count = 0
+            operators = []
+            if stations_df is not None:
+                city_filter = stations_df[
+                    stations_df['city'].str.contains(q, case=False, na=False) |
+                    stations_df['address'].str.contains(q, case=False, na=False) |
+                    stations_df['station_name'].str.contains(q, case=False, na=False)
+                ]
+                existing_stations_count = len(city_filter)
+                if existing_stations_count > 0:
+                    fast_count = int(city_filter['is_fast_charger'].sum()) if 'is_fast_charger' in city_filter.columns else 0
+                    ac_count = existing_stations_count - fast_count
+                    if 'operator' in city_filter.columns:
+                        raw_ops = city_filter['operator'].dropna().unique().tolist()
+                        operators = [str(op) for op in raw_ops if op and str(op).lower() != 'unknown'][:4]
+
+            # 5. Structure payload for AI reasoning
+            structured_data = {
+                "city": location,
+                "vehicle_type": vehicle_type,
+                "candidate_locations": [
+                    {
+                        "name": c["name"],
+                        "area": c["area"],
+                        "ml_hotspot_score": c["ml_hotspot_score"],
+                        "registered_total_vehicles": c["total_registrations"],
+                        "registered_target_vehicles": c["target_registrations"],
+                        "ev_penetration_percent": c["ev_penetration_pct"],
+                        "coordinates": c["coordinates"]
+                    } for c in candidates[:5]
+                ],
+                "existing_charging_infrastructure": {
+                    "total_existing_stations_in_city": existing_stations_count,
+                    "fast_dc_chargers_count": fast_count,
+                    "ac_chargers_count": ac_count,
+                    "sample_known_operators": operators
+                }
+            }
+
+            # 6. Call OpenAI if API key exists, otherwise fallback to deterministic engine
+            openai_api_key = os.environ.get("OPENAI_API_KEY", "").strip()
+            ai_recommendation_result = None
+            ai_source = "local-deterministic"
+
+            if openai_api_key and openai_api_key != "your_openai_api_key_here":
+                try:
+                    ai_recommendation_result = self._query_openai_for_recommendation(openai_api_key, structured_data, top_candidate)
+                    if ai_recommendation_result:
+                        ai_source = "openai-gpt"
+                        print(f"[API AI] Successfully generated recommendation using OpenAI GPT API")
+                except Exception as oai_err:
+                    print(f"[WARN] OpenAI API request failed: {oai_err}. Using verified data engine fallback.")
+
+            if not ai_recommendation_result:
+                ai_recommendation_result = self._generate_deterministic_recommendation(structured_data, top_candidate)
+
+            # Assemble Final Response
+            response_payload = {
+                "status": "success",
+                "city": location,
+                "vehicle_type": vehicle_type,
+                "ai_source": ai_source,
+                "recommended_location": ai_recommendation_result.get("recommended_location", f"{location} — {top_candidate['name']}"),
+                "recommendation_rating": ai_recommendation_result.get("recommendation_rating", "Highly Recommended"),
+                "ml_hotspot_score": top_candidate["ml_hotspot_score"],
+                "why_this_location": ai_recommendation_result.get("why_this_location", []),
+                "infrastructure_gap": ai_recommendation_result.get("infrastructure_gap", "High Gap"),
+                "important_considerations": ai_recommendation_result.get("important_considerations", []),
+                "ai_analysis": ai_recommendation_result.get("ai_analysis", ""),
+                "recommended_coordinates": top_candidate["coordinates"],
+                "candidates_evaluated": candidates,
+                "existing_infrastructure": {
+                    "total_stations": existing_stations_count,
+                    "fast_chargers": fast_count,
+                    "ac_chargers": ac_count,
+                    "operators": operators
+                }
+            }
+
+            self.send_json_response(response_payload, 200)
+
+        except Exception as e:
+            print(f"[API ERROR] AI Location Recommendation failed: {e}")
+            self.send_json_response({"error": f"Internal server error during AI recommendation: {str(e)}"}, 500)
+
+    def _query_openai_for_recommendation(self, api_key, structured_data, top_candidate):
+        model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+        system_prompt = (
+            "You are the EVision India Senior Infrastructure AI.\n"
+            "Your task is to analyze candidate EV charging station locations for a selected city based SOLELY on the supplied project data.\n\n"
+            "CRITICAL CONSTRAINTS:\n"
+            "1. Base all reasoning, scores, and recommendations STRICTLY on the provided real data (ML hotspot scores, EV registration counts, EV penetration, and existing charging station counts).\n"
+            "2. DO NOT invent or hallucinate missing data, numbers, revenue, ROI, coordinates, or station counts.\n"
+            "3. If any data is unavailable, state: 'Data not available in the current analysis.'\n"
+            "4. Clearly distinguish between the 'ML Hotspot Score' (generated by the Random Forest model) and your 'AI Recommendation'.\n"
+            "5. Choose the strongest candidate location and explain WHY with 3 to 5 clear, factual bullet points.\n"
+            "6. Output MUST be valid JSON with NO Markdown formatting backticks, conforming to this schema:\n"
+            "{\n"
+            '  "recommended_location": "<City — Specific Candidate Location Name>",\n'
+            '  "recommendation_rating": "Highly Recommended",\n'
+            '  "ml_hotspot_score": <number matching the top candidate\'s score>,\n'
+            '  "why_this_location": ["3 to 5 concise bullet points supported strictly by data"],\n'
+            '  "infrastructure_gap": "<High / Moderate / Low>: <brief explanation based on existing station count vs EV adoption>",\n'
+            '  "important_considerations": ["2 to 3 pre-construction checks or site considerations"],\n'
+            '  "ai_analysis": "<A concise 2-3 sentence strategic rationale comparing the chosen candidate against other evaluated options based strictly on data.>"\n'
+            "}"
+        )
+
+        user_content = json.dumps(structured_data, indent=2)
+        request_body = {
+            "model": model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"Analyze this verified EVision project data and recommend the optimal location:\n\n{user_content}"}
+            ],
+            "temperature": 0.2,
+            "response_format": {"type": "json_object"}
+        }
+
+        req = urllib.request.Request(
+            "https://api.openai.com/v1/chat/completions",
+            data=json.dumps(request_body).encode("utf-8"),
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {api_key}"
+            },
+            method="POST"
+        )
+
+        with urllib.request.urlopen(req, timeout=25) as response:
+            resp_body = response.read().decode("utf-8")
+            resp_json = json.loads(resp_body)
+            content_str = resp_json["choices"][0]["message"]["content"]
+            parsed_result = json.loads(content_str)
+            return parsed_result
+
+    def _generate_deterministic_recommendation(self, structured_data, top_candidate):
+        city = structured_data["city"]
+        vtype = structured_data["vehicle_type"]
+        score = top_candidate["ml_hotspot_score"]
+        name = top_candidate["name"]
+        total_reg = top_candidate["total_registrations"]
+        target_reg = top_candidate["target_registrations"]
+        pen_pct = top_candidate["ev_penetration_pct"]
+        infra = structured_data["existing_charging_infrastructure"]
+        total_stns = infra["total_existing_stations_in_city"]
+
+        # Infrastructure gap calculation
+        if total_stns <= 5:
+            gap_str = f"High — Only {total_stns} registered charging station(s) found in {city} against {total_reg:,} total registered vehicles, indicating an acute EV infrastructure deficit."
+        elif total_stns <= 20:
+            gap_str = f"Moderate — {total_stns} charging stations operate across the wider {city} metro, but high-density zones like {name} experience supply bottlenecks."
+        else:
+            gap_str = f"Moderate to Low — {total_stns} existing charging stations are operational in {city}; strategic high-power fast charging deployment is recommended to avoid oversaturation."
+
+        rating = "Highly Recommended" if score >= 70.0 else "Recommended" if score >= 45.0 else "Conditionally Feasible"
+
+        why_points = [
+            f"EVision Hotspot Score of {score}/100 indicating strong commercial viability based on regional mobility demand.",
+            f"High vehicle demand with {total_reg:,} total registered vehicles and {target_reg:,} target {vtype.lower()} units in the administrative catchment.",
+            f"Active EV adoption momentum with an estimated {pen_pct}% local EV penetration rate.",
+            f"Significant infrastructure supply gap in the immediate {name} zone relative to vehicle mobility exposure."
+        ]
+
+        considerations = [
+            "Verify 11kV/33kV feeder substation line distance and DISCOM transformer headroom before site civil work.",
+            "Obtain municipal commercial ingress approvals for multi-bay charger deceleration slipways.",
+            "Assess local land lease costs against projected vehicle turnover dwell times."
+        ]
+
+        analysis = (
+            f"Based on real project telemetry, {name} ranks as the optimal charging station deployment hub in {city} "
+            f"with an EVision Hotspot Score of {score}/100. The strong ratio of target {vtype.lower()} vehicles ({target_reg:,}) "
+            f"coupled with an EV penetration of {pen_pct}% and limited localized DC charging coverage provides maximum utilization potential."
+        )
+
+        return {
+            "recommended_location": f"{city} — {name}",
+            "recommendation_rating": rating,
+            "ml_hotspot_score": score,
+            "why_this_location": why_points,
+            "infrastructure_gap": gap_str,
+            "important_considerations": considerations,
+            "ai_analysis": analysis
+        }
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # FEATURE #2: WHY THIS LOCATION
+    # ══════════════════════════════════════════════════════════════════════════
+    def handle_ai_location_explanation(self):
+        global pipeline, rto_df, stations_df
+        
+        if pipeline is None or rto_df is None:
+            self.send_json_response({"error": "ML Model or RTO metadata is not loaded on the server."}, 500)
+            return
+
+        try:
+            content_length = int(self.headers.get('Content-Length', 0))
+            post_data = self.rfile.read(content_length)
+            request_data = json.loads(post_data.decode('utf-8'))
+            
+            location = request_data.get('location', '').strip()
+            vehicle_type = request_data.get('vehicle_type', 'Both').strip()
+            
+            if not location:
+                self.send_json_response({"error": "Missing 'location' parameter."}, 400)
+                return
+                
+            if vehicle_type not in ["Two-Wheeler", "Four-Wheeler", "Both"]:
+                vehicle_type = "Both"
+
+            print(f"[API AI - Why Location] Request: location='{location}', vehicle_type='{vehicle_type}'")
+
+            # 1. Match RTO
+            q = location.strip().lower()
+            city_map = {
+                "bengaluru": ["bengaluru central rto", "bengaluru east rto", "bengaluru north rto", "bengaluru south rto", "bengaluru west rto", "chandapura, bengaluru rto"],
+                "bangalore": ["bengaluru central rto", "bengaluru east rto", "bengaluru north rto", "bengaluru south rto", "bengaluru west rto", "chandapura, bengaluru rto"],
+                "mumbai": ["mumbai (central)", "mumbai (east)", "mumbai (west)", "vashi (new mumbai)"],
+                "delhi ncr": ["south delhi", "dwarka", "janakpuri", "rohini", "vasant vihar", "surajmal vihar"],
+                "delhi": ["south delhi", "dwarka", "janakpuri", "rohini", "vasant vihar", "surajmal vihar"],
+                "pune": ["pune", "dy rto pimpri chinchwad"],
+                "chennai": ["chennai (central) rto", "chennai (east) rto", "chennai (north) rto", "chennai (west) rto", "chennai (south) rto"],
+                "ahmedabad": ["ahmedabad", "ahmedabad east"],
+                "jaipur": ["jaipur (first) rto", "jaipur (second) rto", "vidhyadhar nagar,jaipur dto"],
+                "lucknow": ["mahanagar arto lucknow (up321)", "transport nagar rto lucknow (up32)"],
+                "kochi": ["ernakulam rto", "muvattupuzha rto"],
+                "hyderabad": ["vijayawada rta", "guntur rta"]
+            }
+            
+            matched_names = []
+            for city_key, names in city_map.items():
+                if city_key in q or q in city_key:
+                    matched_names.extend(names)
+            
+            matches = pd.DataFrame()
+            if matched_names:
+                matches = rto_df[rto_df['office_name'].str.lower().isin(matched_names)]
+                
+            if matches.empty:
+                matches = rto_df[
+                    rto_df['office_name'].str.lower().str.contains(q, na=False) |
+                    rto_df['state_name'].str.lower().str.contains(q, na=False)
+                ]
+                
+            if matches.empty:
+                self.send_json_response({
+                    "error": f"No registered RTO locations matched query '{location}'. Please try a major city (e.g. Pune, Bengaluru, Mumbai, Delhi)."
+                }, 404)
+                return
+
+            matches = matches.drop_duplicates(subset=['office_code'])
+
+            # 2. Predict with Random Forest model
+            if vehicle_type == 'Both':
+                tw_reg = matches['two_wheeler_registrations']
+                tw_ratio = matches['tw_ratio']
+                features_tw = pd.DataFrame({
+                    'state_name': matches['state_name'],
+                    'vehicle_type': ['Two-Wheeler'] * len(matches),
+                    'total_registrations': matches['total_registrations'],
+                    'target_vehicle_registrations': tw_reg,
+                    'target_vehicle_ratio': tw_ratio,
+                    'state_ev_penetration_avg': matches['state_ev_penetration_avg']
+                })
+                scores_tw = pipeline.predict(features_tw)
+                
+                fw_reg = matches['four_wheeler_registrations']
+                fw_ratio = matches['fw_ratio']
+                features_fw = pd.DataFrame({
+                    'state_name': matches['state_name'],
+                    'vehicle_type': ['Four-Wheeler'] * len(matches),
+                    'total_registrations': matches['total_registrations'],
+                    'target_vehicle_registrations': fw_reg,
+                    'target_vehicle_ratio': fw_ratio,
+                    'state_ev_penetration_avg': matches['state_ev_penetration_avg']
+                })
+                scores_fw = pipeline.predict(features_fw)
+                scores = (scores_tw + scores_fw) / 2
+            else:
+                target_reg = matches['two_wheeler_registrations'] if vehicle_type == 'Two-Wheeler' else matches['four_wheeler_registrations']
+                target_ratio = matches['tw_ratio'] if vehicle_type == 'Two-Wheeler' else matches['fw_ratio']
+                features_df = pd.DataFrame({
+                    'state_name': matches['state_name'],
+                    'vehicle_type': [vehicle_type] * len(matches),
+                    'total_registrations': matches['total_registrations'],
+                    'target_vehicle_registrations': target_reg,
+                    'target_vehicle_ratio': target_ratio,
+                    'state_ev_penetration_avg': matches['state_ev_penetration_avg']
+                })
+                scores = pipeline.predict(features_df)
+
+            # Top candidate
+            best_idx = int(scores.argmax())
+            best_row = matches.iloc[best_idx]
+            best_score = round(min(max(float(scores[best_idx]), 0.0), 100.0), 1)
+            coords = RTO_COORDINATES.get(best_row['office_name'], {"lat": 18.5204, "lng": 73.8567})
+
+            # 3. Query OpenCharge stations
+            existing_stations_count = 0
+            fast_count = 0
+            ac_count = 0
+            operators = []
+            if stations_df is not None:
+                city_filter = stations_df[
+                    stations_df['city'].str.contains(q, case=False, na=False) |
+                    stations_df['address'].str.contains(q, case=False, na=False) |
+                    stations_df['station_name'].str.contains(q, case=False, na=False)
+                ]
+                existing_stations_count = len(city_filter)
+                if existing_stations_count > 0:
+                    fast_count = int(city_filter['is_fast_charger'].sum()) if 'is_fast_charger' in city_filter.columns else 0
+                    ac_count = existing_stations_count - fast_count
+                    if 'operator' in city_filter.columns:
+                        raw_ops = city_filter['operator'].dropna().unique().tolist()
+                        operators = [str(op) for op in raw_ops if op and str(op).lower() != 'unknown'][:5]
+
+            # 4. Structured data for OpenAI
+            total_reg = int(best_row['total_registrations']) if pd.notna(best_row['total_registrations']) else 0
+            tw_reg_val = int(best_row['two_wheeler_registrations']) if pd.notna(best_row['two_wheeler_registrations']) else 0
+            fw_reg_val = int(best_row['four_wheeler_registrations']) if pd.notna(best_row['four_wheeler_registrations']) else 0
+            ev_pen = float(best_row['ev_penetration']) if pd.notna(best_row['ev_penetration']) else 0.0
+            target_reg_val = tw_reg_val if vehicle_type == 'Two-Wheeler' else fw_reg_val if vehicle_type == 'Four-Wheeler' else (tw_reg_val + fw_reg_val)
+
+            structured_data = {
+                "location_name": f"{location} — {best_row['office_name']}",
+                "office_code": str(best_row['office_code']),
+                "state": str(best_row['state_name']),
+                "vehicle_type": vehicle_type,
+                "ml_hotspot_score": best_score,
+                "total_registrations": total_reg,
+                "target_registrations": target_reg_val,
+                "ev_penetration_percent": round(ev_pen * 100, 2),
+                "existing_charging_station_count": existing_stations_count,
+                "fast_chargers_count": fast_count,
+                "ac_chargers_count": ac_count,
+                "known_operators": operators,
+                "coordinates": coords
+            }
+
+            # 5. Call OpenAI or fallback
+            openai_api_key = os.environ.get("OPENAI_API_KEY", "").strip()
+            ai_result = None
+            ai_source = "local-deterministic"
+
+            if openai_api_key and openai_api_key != "your_openai_api_key_here":
+                try:
+                    ai_result = self._query_openai_for_location_explanation(openai_api_key, structured_data)
+                    if ai_result:
+                        ai_source = "openai-gpt"
+                except Exception as oai_err:
+                    print(f"[WARN] OpenAI call for Why Location failed: {oai_err}")
+
+            if not ai_result:
+                ai_result = self._generate_deterministic_why_location(structured_data)
+
+            response_payload = {
+                "status": "success",
+                "ai_source": ai_source,
+                "recommended_location": ai_result.get("recommended_location", f"{location} — {best_row['office_name']}"),
+                "ml_hotspot_score": best_score,
+                "ai_assessment": ai_result.get("ai_assessment", "High Suitability" if best_score >= 60 else "Moderate Suitability"),
+                "why_this_location": ai_result.get("why_this_location", []),
+                "infrastructure_gap": ai_result.get("infrastructure_gap", "Data not available for this factor."),
+                "competition": ai_result.get("competition", f"Analyzed {existing_stations_count} local charging stations in {location}."),
+                "ai_summary": ai_result.get("ai_summary", ""),
+                "important_considerations": ai_result.get("important_considerations", []),
+                "coordinates": coords,
+                "raw_metrics": {
+                    "total_registrations": total_reg,
+                    "target_registrations": target_reg_val,
+                    "ev_penetration_pct": round(ev_pen * 100, 2),
+                    "existing_stations": existing_stations_count,
+                    "fast_chargers": fast_count,
+                    "ac_chargers": ac_count
+                }
+            }
+
+            self.send_json_response(response_payload, 200)
+
+        except Exception as e:
+            print(f"[API ERROR] AI Location Explanation failed: {e}")
+            self.send_json_response({"error": f"Internal server error: {str(e)}"}, 500)
+
+    def _query_openai_for_location_explanation(self, api_key, structured_data):
+        model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+        system_prompt = (
+            "You are the EVision India Senior Infrastructure AI.\n"
+            "Explain WHY the selected candidate location is suitable for an EV charging station based SOLELY on the supplied data.\n\n"
+            "CRITICAL RULES:\n"
+            "1. Use ONLY the provided real data (ML hotspot score, EV registrations, EV penetration, and existing stations count).\n"
+            "2. DO NOT invent or hallucinate missing values, numbers, or facts.\n"
+            "3. If any data is unavailable, state: 'Data not available for this factor.'\n"
+            "4. Return a clean JSON object with NO Markdown wrappers conforming to:\n"
+            "{\n"
+            '  "recommended_location": "<Location Name>",\n'
+            '  "ml_hotspot_score": <number>,\n'
+            '  "ai_assessment": "<High Suitability / Medium Suitability / Low Suitability>",\n'
+            '  "why_this_location": [\n'
+            '    "1. Concise data-backed reason...",\n'
+            '    "2. Concise data-backed reason...",\n'
+            '    "3. Concise data-backed reason...",\n'
+            '    "4. Concise data-backed reason..."\n'
+            '  ],\n'
+            '  "infrastructure_gap": "<Analysis comparing existing charging stations with regional vehicle adoption>",\n'
+            '  "competition": "<Analysis of existing charging stations, fast vs AC points, and operator coverage in this area>",\n'
+            '  "ai_summary": "<A short 2-sentence summary of the strategic suitability>",\n'
+            '  "important_considerations": ["Pre-construction grid, transformer, or land lease considerations"]\n'
+            "}"
+        )
+
+        user_content = json.dumps(structured_data, indent=2)
+        request_body = {
+            "model": model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"Explain why this location is suitable using only this verified project data:\n\n{user_content}"}
+            ],
+            "temperature": 0.2,
+            "response_format": {"type": "json_object"}
+        }
+
+        req = urllib.request.Request(
+            "https://api.openai.com/v1/chat/completions",
+            data=json.dumps(request_body).encode("utf-8"),
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {api_key}"
+            },
+            method="POST"
+        )
+
+        with urllib.request.urlopen(req, timeout=25) as response:
+            resp_body = response.read().decode("utf-8")
+            resp_json = json.loads(resp_body)
+            content_str = resp_json["choices"][0]["message"]["content"]
+            return json.loads(content_str)
+
+    def _generate_deterministic_why_location(self, d):
+        name = d["location_name"]
+        score = d["ml_hotspot_score"]
+        total_reg = d["total_registrations"]
+        target_reg = d["target_registrations"]
+        vtype = d["vehicle_type"]
+        pen_pct = d["ev_penetration_percent"]
+        stns = d["existing_charging_station_count"]
+        fast = d["fast_chargers_count"]
+        ac = d["ac_chargers_count"]
+
+        assessment = "High Suitability" if score >= 65 else "Medium Suitability" if score >= 45 else "Low Suitability"
+
+        reasons = [
+            f"EVision Hotspot Score of {score}/100 indicating high station viability based on verified regional mobility datasets.",
+            f"High vehicle demand with {total_reg:,} registered vehicles and {target_reg:,} target {vtype.lower()} vehicles in this local catchment.",
+            f"Active EV adoption momentum with an estimated {pen_pct}% local EV penetration rate.",
+            f"Substantial underserved charging deficit: only {stns} existing charging station(s) ({fast} Fast DC, {ac} AC) currently available for this area."
+        ]
+
+        infra_gap = (
+            f"High infrastructure gap: {stns} operational station(s) recorded in the area against {target_reg:,} target vehicles. "
+            f"Fast charging throughput is urgently needed during peak commute hours."
+        ) if stns <= 10 else (
+            f"Moderate infrastructure gap: {stns} charging stations operate in the micro-market ({fast} Fast DC). High-speed multi-gun expansion is recommended."
+        )
+
+        comp = f"Currently {stns} stations exist in this city perimeter. Fast charging infrastructure represents {fast} of {stns} points, leaving high headroom for reliable DC hubs."
+
+        summary = f"{name} demonstrates strong charging asset viability with a {score}/100 EVision Hotspot Score, supported by substantial {vtype.lower()} demand ({target_reg:,} vehicles) and an acute localized fast-charging supply gap."
+
+        considerations = [
+            "Confirm 11kV HT feeder line proximity and DISCOM substation capacity before civil excavation.",
+            "Verify lease terms and physical road ingress for optimal vehicle turnaround."
+        ]
+
+        return {
+            "recommended_location": name,
+            "ml_hotspot_score": score,
+            "ai_assessment": assessment,
+            "why_this_location": reasons,
+            "infrastructure_gap": infra_gap,
+            "competition": comp,
+            "ai_summary": summary,
+            "important_considerations": considerations
+        }
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # BUSINESS CALCULATION HELPER (Reused across Simulator and Optimizer)
+    # ══════════════════════════════════════════════════════════════════════════
+    def _calculate_business_model(self, location, vehicle_type, budget, charger_type, points):
+        # 1. Hotspot score
+        q = location.strip().lower()
+        coords = None
+        for rto_name, c in RTO_COORDINATES.items():
+            if q in rto_name.lower() or rto_name.lower() in q:
+                coords = c
+                break
+        if not coords:
+            coords = {"lat": 18.5204, "lng": 73.8567}
+
+        hotspot_score = find_nearest_rto_score(coords['lat'], coords['lng'], vehicle_type)
+
+        power_map = {
+            "AC Slow Charger (3.3 kW)": 3.3,
+            "DC Fast Charger (15 kW)": 15.0,
+            "AC Type 2 (22 kW)": 22.0,
+            "DC CCS2 Fast (50 kW)": 50.0,
+            "DC CCS2 Fast (60 kW)": 60.0,
+            "DC CCS2 Ultra-Fast (120 kW)": 120.0,
+            "Combined AC (3.3 kW + 22 kW)": 12.6,
+            "Combined DC Fast (15 kW + 50 kW)": 32.5,
+            "Dual 60kW DC Fast Hub": 120.0,
+            "Dual 30kW DC Fast": 60.0
+        }
+        charger_power = power_map.get(charger_type, 50.0)
+
+        utilization_rate = (hotspot_score / 100.0) * 0.15 + 0.02
+        utilization_hours = utilization_rate * 24.0
+
+        session_duration = 1.5 if vehicle_type == 'Two-Wheeler' else (1.0 if vehicle_type == 'Four-Wheeler' else 1.25)
+        sessions_per_point_day = utilization_hours / session_duration
+        daily_sessions = sessions_per_point_day * points
+        monthly_sessions = int(daily_sessions * 30)
+
+        monthly_energy = round(utilization_hours * charger_power * points * 30, 1)
+
+        charge_rate = 12.0 if vehicle_type == 'Two-Wheeler' else (18.0 if vehicle_type == 'Four-Wheeler' else 15.0)
+        monthly_revenue = int(monthly_energy * charge_rate)
+
+        elect_cost = monthly_energy * 7.5
+        maint_cost = points * 2000
+        monthly_cost = int(elect_cost + maint_cost)
+        monthly_profit = int(monthly_revenue - monthly_cost)
+
+        budget_float = float(budget) if budget else 1000000.0
+        if monthly_profit > 0:
+            payback_months = round(budget_float / monthly_profit, 1)
+            payback_years = round(budget_float / (monthly_profit * 12), 2)
+        else:
+            payback_months = 999.0
+            payback_years = 99.0
+
+        annual_profit = monthly_profit * 12
+        roi_pct = round((annual_profit / budget_float) * 100, 1) if budget_float > 0 else 0.0
+
+        return {
+            "location": location,
+            "vehicle_type": vehicle_type,
+            "budget": budget_float,
+            "charger_type": charger_type,
+            "points": points,
+            "total_power_kw": round(charger_power * points, 1),
+            "hotspot_score": hotspot_score,
+            "utilization_pct": round(utilization_rate * 100, 1),
+            "expected_sessions_monthly": monthly_sessions,
+            "monthly_energy_kwh": monthly_energy,
+            "estimated_revenue_monthly": monthly_revenue,
+            "estimated_cost_monthly": monthly_cost,
+            "estimated_profit_monthly": monthly_profit,
+            "estimated_profit_annual": annual_profit,
+            "roi_pct": roi_pct,
+            "payback_period_years": payback_years if payback_years < 30 else "10+ Years",
+            "payback_period_months": payback_months if payback_months < 120 else "120+ Months"
+        }
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # FEATURE #3: AI SIMULATOR
+    # ══════════════════════════════════════════════════════════════════════════
+    def handle_ai_simulation_analysis(self):
+        try:
+            content_length = int(self.headers.get('Content-Length', 0))
+            post_data = self.rfile.read(content_length)
+            request_data = json.loads(post_data.decode('utf-8'))
+            
+            location = request_data.get('location', 'Pune').strip()
+            vehicle_type = request_data.get('vehicle_type', 'Both').strip()
+            budget = float(request_data.get('budget', 1000000))
+            charger_type = request_data.get('charger_type', 'DC CCS2 Fast (50 kW)')
+            points = int(request_data.get('points', 2))
+            
+            scenario_a = self._calculate_business_model(location, vehicle_type, budget, charger_type, points)
+            
+            scenario_b = None
+            if 'scenario_b' in request_data and request_data['scenario_b']:
+                sb_data = request_data['scenario_b']
+                b_budget = float(sb_data.get('budget', 1800000))
+                b_charger = sb_data.get('charger_type', 'DC CCS2 Fast (50 kW)')
+                b_points = int(sb_data.get('points', 4))
+                scenario_b = self._calculate_business_model(location, vehicle_type, b_budget, b_charger, b_points)
+
+            # Query OpenAI for simulation narrative
+            openai_api_key = os.environ.get("OPENAI_API_KEY", "").strip()
+            ai_analysis = None
+            ai_source = "local-deterministic"
+
+            if openai_api_key and openai_api_key != "your_openai_api_key_here":
+                try:
+                    ai_analysis = self._query_openai_for_simulation(openai_api_key, scenario_a, scenario_b)
+                    if ai_analysis:
+                        ai_source = "openai-gpt"
+                except Exception as oai_err:
+                    print(f"[WARN] OpenAI call for Simulator failed: {oai_err}")
+
+            if not ai_analysis:
+                ai_analysis = self._generate_deterministic_simulation_analysis(scenario_a, scenario_b)
+
+            response_payload = {
+                "status": "success",
+                "ai_source": ai_source,
+                "scenario_a": scenario_a,
+                "scenario_b": scenario_b,
+                "ai_analysis": ai_analysis
+            }
+            self.send_json_response(response_payload, 200)
+
+        except Exception as e:
+            print(f"[API ERROR] AI Simulation Analysis failed: {e}")
+            self.send_json_response({"error": f"Internal server error: {str(e)}"}, 500)
+
+    def _query_openai_for_simulation(self, api_key, scenario_a, scenario_b):
+        model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+        system_prompt = (
+            "You are the EVision India Senior Financial & Infrastructure AI.\n"
+            "Analyze the provided charging station simulation results computed by our backend.\n\n"
+            "RULES:\n"
+            "1. Use ONLY the provided calculated figures (revenue, operating cost, profit, ROI, payback period, utilization).\n"
+            "2. DO NOT invent or recalculate different numbers.\n"
+            "3. Provide structured financial insights explaining strengths, cost drivers, utilization dynamics, and risks.\n"
+            "4. If Scenario B is provided, compare Scenario A vs Scenario B and recommend which is more suitable and why.\n"
+            "5. Return clean JSON with NO Markdown wrappers conforming to:\n"
+            "{\n"
+            '  "overview": "<A concise 2-sentence financial verdict based strictly on calculated metrics>",\n'
+            '  "strengths": ["2 to 3 factual financial strengths based on the numbers"],\n'
+            '  "weaknesses": ["1 to 2 financial weaknesses or cost bottlenecks"],\n'
+            '  "cost_factors": "<Explanation of electricity cost vs fixed maintenance>",\n'
+            '  "utilization_considerations": "<Assessment of expected daily sessions and utilization rate>",\n'
+            '  "payback_considerations": "<Assessment of capital recovery period>",\n'
+            '  "potential_risks": ["2 key operational or market risks"],\n'
+            '  "comparison_verdict": "<If Scenario B is provided, explain which scenario is more financially suitable and why. Otherwise empty string.>"\n'
+            "}"
+        )
+
+        user_content = json.dumps({"scenario_a": scenario_a, "scenario_b": scenario_b}, indent=2)
+        request_body = {
+            "model": model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"Analyze these calculated simulation results:\n\n{user_content}"}
+            ],
+            "temperature": 0.2,
+            "response_format": {"type": "json_object"}
+        }
+
+        req = urllib.request.Request(
+            "https://api.openai.com/v1/chat/completions",
+            data=json.dumps(request_body).encode("utf-8"),
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {api_key}"
+            },
+            method="POST"
+        )
+
+        with urllib.request.urlopen(req, timeout=25) as response:
+            resp_body = response.read().decode("utf-8")
+            resp_json = json.loads(resp_body)
+            content_str = resp_json["choices"][0]["message"]["content"]
+            return json.loads(content_str)
+
+    def _generate_deterministic_simulation_analysis(self, s_a, s_b=None):
+        rev = s_a["estimated_revenue_monthly"]
+        prof = s_a["estimated_profit_monthly"]
+        roi = s_a["roi_pct"]
+        pb = s_a["payback_period_years"]
+        ut = s_a["utilization_pct"]
+        pts = s_a["points"]
+        chg = s_a["charger_type"]
+        bgt = s_a["budget"]
+
+        overview = f"Based on the selected configuration ({pts}x {chg} with budget of ₹{bgt:,.0f}), this setup delivers a modeled annual ROI of {roi}% and capital recovery in approximately {pb} years at {ut}% baseline utilization."
+        strengths = [
+            f"Generates an estimated monthly net profit of ₹{prof:,} from ₹{rev:,} gross revenue.",
+            f"Healthy annual return on investment of {roi}% under conservative {ut}% daily asset utilization."
+        ]
+        weaknesses = [
+            f"Monthly power draw tariff (₹7.5/kWh) represents the single largest variable OpEx driver.",
+            f"Fixed monthly maintenance fee of ₹{pts * 2000:,} applies regardless of seasonal session swings."
+        ]
+        cost_factors = f"Electricity consumption constitutes ~{(s_a['monthly_energy_kwh']*7.5)/(s_a['estimated_cost_monthly'])*100:.0f}% of total monthly operating expense." if s_a['estimated_cost_monthly'] > 0 else "Low operating overhead."
+        util_cons = f"Model projects {s_a['expected_sessions_monthly']} monthly charging sessions based on regional EV traffic exposure."
+        pb_cons = f"Capital recovery is estimated at {pb} years based on steady-state operation."
+        risks = [
+            "Local grid transformer sanction delays or HT tariff adjustments by DISCOM.",
+            "Commissioning of competing fast-charging points within 2 km radius."
+        ]
+
+        comp_verdict = ""
+        if s_b:
+            roi_b = s_b["roi_pct"]
+            prof_b = s_b["estimated_profit_monthly"]
+            if prof_b > prof and roi_b >= roi * 0.9:
+                comp_verdict = f"Scenario B ({s_b['points']}x {s_b['charger_type']}) generates higher monthly net profit (₹{prof_b:,} vs ₹{prof:,}) and is recommended for high-traffic corridors with available capital headroom."
+            else:
+                comp_verdict = f"Scenario A provides a higher capital efficiency (ROI of {roi}% vs {roi_b}%) with lower initial budget exposure, making it more resilient for entry deployment."
+
+        return {
+            "overview": overview,
+            "strengths": strengths,
+            "weaknesses": weaknesses,
+            "cost_factors": cost_factors,
+            "utilization_considerations": util_cons,
+            "payback_considerations": pb_cons,
+            "potential_risks": risks,
+            "comparison_verdict": comp_verdict
+        }
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # FEATURE #4: AI CONFIGURATION OPTIMIZER
+    # ══════════════════════════════════════════════════════════════════════════
+    def handle_ai_configuration_optimization(self):
+        try:
+            content_length = int(self.headers.get('Content-Length', 0))
+            post_data = self.rfile.read(content_length)
+            request_data = json.loads(post_data.decode('utf-8'))
+            
+            location = request_data.get('location', 'Pune').strip()
+            vehicle_type = request_data.get('vehicle_type', 'Both').strip()
+            budget = float(request_data.get('budget', 1500000))
+            goal = request_data.get('goal', 'max_profit').strip() # max_profit, max_roi, fastest_payback, lowest_investment, max_capacity
+
+            # Generate realistic candidate configurations based on vehicle type and budget
+            candidate_specs = [
+                {"name": "Dual Fast DC Hub (50 kW)", "charger_type": "DC CCS2 Fast (50 kW)", "points": 2, "cost": budget * 0.85},
+                {"name": "High-Power DC Dispenser (120 kW)", "charger_type": "DC CCS2 Ultra-Fast (120 kW)", "points": 2, "cost": max(budget * 1.25, 2200000)},
+                {"name": "Smart Multi-Port AC Destination Cluster", "charger_type": "AC Type 2 (22 kW)", "points": 4, "cost": min(budget * 0.55, 750000)},
+                {"name": "Hybrid High-Turnover Station (DC + AC)", "charger_type": "Combined DC Fast (15 kW + 50 kW)", "points": 3, "cost": budget * 0.95}
+            ]
+
+            evaluated_configs = []
+            for spec in candidate_specs:
+                m = self._calculate_business_model(location, vehicle_type, spec["cost"], spec["charger_type"], spec["points"])
+                m["config_name"] = spec["name"]
+                m["capex_inr"] = int(spec["cost"])
+                evaluated_configs.append(m)
+
+            # Sort by selected goal
+            if goal == 'max_roi':
+                evaluated_configs.sort(key=lambda x: x['roi_pct'], reverse=True)
+            elif goal == 'fastest_payback':
+                evaluated_configs.sort(key=lambda x: float(x['payback_period_years']) if isinstance(x['payback_period_years'], (int, float)) else 999.0)
+            elif goal == 'lowest_investment':
+                evaluated_configs.sort(key=lambda x: x['capex_inr'])
+            elif goal == 'max_capacity':
+                evaluated_configs.sort(key=lambda x: x['total_power_kw'], reverse=True)
+            else: # max_profit (default)
+                evaluated_configs.sort(key=lambda x: x['estimated_profit_monthly'], reverse=True)
+
+            recommended = evaluated_configs[0]
+            alternatives = evaluated_configs[1:]
+
+            # Query OpenAI for explanation of why this configuration is recommended
+            openai_api_key = os.environ.get("OPENAI_API_KEY", "").strip()
+            ai_explanation = None
+            ai_source = "local-deterministic"
+
+            if openai_api_key and openai_api_key != "your_openai_api_key_here":
+                try:
+                    ai_explanation = self._query_openai_for_optimizer(openai_api_key, location, vehicle_type, goal, budget, recommended, alternatives)
+                    if ai_explanation:
+                        ai_source = "openai-gpt"
+                except Exception as oai_err:
+                    print(f"[WARN] OpenAI call for Config Optimizer failed: {oai_err}")
+
+            if not ai_explanation:
+                ai_explanation = self._generate_deterministic_optimizer_explanation(location, vehicle_type, goal, recommended, alternatives)
+
+            response_payload = {
+                "status": "success",
+                "ai_source": ai_source,
+                "location": location,
+                "vehicle_type": vehicle_type,
+                "optimization_goal": goal,
+                "recommended_configuration": recommended,
+                "why_this_configuration": ai_explanation.get("why_this_configuration", ""),
+                "key_advantages": ai_explanation.get("key_advantages", []),
+                "alternative_configurations": alternatives
+            }
+            self.send_json_response(response_payload, 200)
+
+        except Exception as e:
+            print(f"[API ERROR] AI Configuration Optimization failed: {e}")
+            self.send_json_response({"error": f"Internal server error: {str(e)}"}, 500)
+
+    def _query_openai_for_optimizer(self, api_key, location, vehicle_type, goal, budget, recommended, alternatives):
+        model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+        system_prompt = (
+            "You are the EVision India Senior Hardware & Financial Optimization AI.\n"
+            "Explain WHY the mathematically chosen charging configuration is recommended over the alternatives based SOLELY on the supplied calculated data.\n\n"
+            "RULES:\n"
+            "1. Use ONLY the provided calculated figures for investment, monthly revenue, monthly profit, ROI %, payback period, and capacity kW.\n"
+            "2. DO NOT invent or recalculate different numbers.\n"
+            "3. Clearly explain how the recommended configuration satisfies the user's specific optimization goal better than the alternatives.\n"
+            "4. Return clean JSON with NO Markdown wrappers conforming to:\n"
+            "{\n"
+            '  "why_this_configuration": "<A concise 2-3 sentence explanation of why this configuration wins for the specified goal>",\n'
+            '  "key_advantages": ["3 factual data-backed advantages compared to alternatives"]\n'
+            "}"
+        )
+
+        user_content = json.dumps({
+            "location": location,
+            "vehicle_type": vehicle_type,
+            "optimization_goal": goal,
+            "available_budget": budget,
+            "recommended_configuration": recommended,
+            "alternative_configurations": alternatives
+        }, indent=2)
+
+        request_body = {
+            "model": model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"Explain why this configuration is recommended:\n\n{user_content}"}
+            ],
+            "temperature": 0.2,
+            "response_format": {"type": "json_object"}
+        }
+
+        req = urllib.request.Request(
+            "https://api.openai.com/v1/chat/completions",
+            data=json.dumps(request_body).encode("utf-8"),
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {api_key}"
+            },
+            method="POST"
+        )
+
+        with urllib.request.urlopen(req, timeout=25) as response:
+            resp_body = response.read().decode("utf-8")
+            resp_json = json.loads(resp_body)
+            content_str = resp_json["choices"][0]["message"]["content"]
+            return json.loads(content_str)
+
+    def _generate_deterministic_optimizer_explanation(self, location, vehicle_type, goal, rec, alts):
+        name = rec["config_name"]
+        prof = rec["estimated_profit_monthly"]
+        roi = rec["roi_pct"]
+        pb = rec["payback_period_years"]
+        kw = rec["total_power_kw"]
+        cost = rec["capex_inr"]
+
+        goal_labels = {
+            "max_profit": "Maximum Profit",
+            "max_roi": "Maximum ROI",
+            "fastest_payback": "Fastest Payback",
+            "lowest_investment": "Lowest Investment",
+            "max_capacity": "Maximum Charging Capacity"
+        }
+        g_name = goal_labels.get(goal, "Optimal Balance")
+
+        why_text = (
+            f"The {name} is recommended for {location} targeting '{g_name}' because it delivers the highest performance "
+            f"on your target metric with a monthly net profit of ₹{prof:,}, an annual ROI of {roi}%, and {kw} kW total charging throughput "
+            f"within your capital envelope of ₹{cost:,.0f}."
+        )
+
+        advantages = [
+            f"Optimized for {g_name}: Generates ₹{prof:,}/mo profit with a payback period of {pb} years.",
+            f"Balanced CapEx efficiency: {rec['points']} charging points deliver {kw} kW total power capacity.",
+            f"Outperforms {len(alts)} alternative candidate configurations in capital yield and vehicle dwell-time throughput."
+        ]
+
+        return {
+            "why_this_configuration": why_text,
+            "key_advantages": advantages
+        }
 
     def handle_get_stations(self, query_string):
         global stations_df

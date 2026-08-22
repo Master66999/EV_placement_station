@@ -12,6 +12,11 @@ __pycache__/
 *.pyc
 *.pyo
 
+# Environment Variables & Secrets
+.env
+*.env
+.env.local
+
 # IDE & OS files
 .DS_Store
 Thumbs.db

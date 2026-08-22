@@ -93,6 +93,16 @@
             return true;
         }
 
+        if (normKey === 'research' || normKey === 'research with ai' || normKey === 'ai research' || normKey === 'location recommendation' || normKey === 'ai location recommendation') {
+            const target = resolvePath('research-ai.html');
+            if (window.self !== window.top) {
+                window.top.location.href = target;
+            } else {
+                window.location.href = target;
+            }
+            return true;
+        }
+
         const modId = moduleKeyMap[normKey];
         if (modId) {
             const [modName, extra] = modId.split('&');
